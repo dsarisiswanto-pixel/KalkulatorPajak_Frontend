@@ -1,6 +1,7 @@
       import { useState, useEffect } from "react";
       import api from "../services/api";
       import { MapPin, Phone, Mail } from "lucide-react";
+      import { IoMdCheckmarkCircle } from "react-icons/io";
       import Select from "react-select";
 
       function KalkulatorPajak() {
@@ -496,7 +497,7 @@
                   <img src="src/assets/rrtc.jpeg" className="w-12 h-12 object-contain" />
                 </div>
                 <div>
-                  <h1 className="text-lg font-bold">RRCT.ID</h1>
+                  <h1 className="text-lg font-bold">RRTC.ID</h1>
                   <p className="text-sm text-blue-200">Sistem Perhitungan PPh 21</p>
                 </div>
               </div>
@@ -596,12 +597,12 @@
                       onChange={(e) => setPtkp(e.target.value)}
                       className="w-full border rounded-md p-2 text-sm"
                     >
-                      <option value="">Pilih Status PTKP</option>
-                      {Object.keys(ptkpMapping).map((key) => (
-                        <option key={key} value={key}>
-                          {key}
-                        </option>
-                      ))}
+                  <option value="">Pilih Status PTKP</option>
+                    {Object.keys(ptkpMapping).map((key) => (
+                      <option key={key} value={key}>
+                        {key} - {ptkpMapping[key].toLocaleString("id-ID")}
+                      </option>
+                    ))}
                     </select>
                   </div>
                 )}
@@ -707,10 +708,12 @@
                         onChange={(e) => setPtkp(e.target.value)}
                         className="w-full border rounded-md p-2 text-sm"
                       >
-                        <option value="">Pilih Status PTKP</option>
-                        {Object.keys(ptkpMapping).map((key) => (
-                          <option key={key} value={key}>{key}</option>
-                        ))}
+                   <option value="">Pilih Status PTKP</option>
+                    {Object.keys(ptkpMapping).map((key) => (
+                      <option key={key} value={key}>
+                        {key} - {ptkpMapping[key].toLocaleString("id-ID")}
+                      </option>
+                    ))}
                       </select>
                     </div>
                     
@@ -788,11 +791,13 @@
                       onChange={(e) => setPtkp(e.target.value)}
                       className="w-full border rounded-md p-2 text-sm mb-4"
                     >
-                      <option value="">Pilih Status PTKP</option>
-                      {Object.keys(ptkpMapping).map((key) => (
-                        <option key={key} value={key}>{key}</option>
-                      ))}
-                    </select>
+                    <option value="">Pilih Status PTKP</option>
+                    {Object.keys(ptkpMapping).map((key) => (
+                      <option key={key} value={key}>
+                        {key} - {ptkpMapping[key].toLocaleString("id-ID")}
+                      </option>
+                    ))}
+                                        </select>
                   </div>
                   <div>
                     <label className="text-xs text-gray-500 mt-4">
@@ -1269,13 +1274,15 @@
               </div>
             )}
     {notif.show && (
-      <div
-        className={`fixed top-5 right-5 bg-blue-900 text-white px-4 py-3 rounded-lg shadow-lg text-sm
-        ${notif.exiting ? "animate-slideOut" : "animate-slideIn"}`}
-      >
-        {notif.message}
-      </div>
-    )}
+  <div
+    className={`fixed top-5 right-5 bg-blue-400 text-white px-4 py-3 rounded-lg shadow-lg text-sm
+    flex items-center gap-2
+    ${notif.exiting ? "animate-slideOut" : "animate-slideIn"}`} 
+  >
+    <IoMdCheckmarkCircle size={20} className="shrink-0" />
+    <span>{notif.message}</span>
+  </div>
+)}
           </div>
         );
       }
