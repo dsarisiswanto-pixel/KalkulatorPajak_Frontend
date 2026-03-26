@@ -1,64 +1,64 @@
-  import { useState, useEffect } from "react";
-  import api from "../services/api";
-  import { MapPin, Phone, Mail } from "lucide-react";
-  import Select from "react-select";
+import { useState, useEffect } from "react";
+import api from "../services/api";
+import { MapPin, Phone, Mail } from "lucide-react";
+import Select from "react-select";
 
-  function KalkulatorPajak() {
+function KalkulatorPajak() {
 
-    const selectStyles = {
-  container: (base) => ({
-    ...base,
-    width: "100%"
-  }),
-  menu: (base) => ({
-    ...base,
-    width: "100%",
-    maxWidth: "100%"
-  }),
-  option: (base) => ({
-    ...base,
-    whiteSpace: "normal",
-    wordBreak: "break-word"
-  }),
-  menuPortal: (base) => ({
-    ...base,
-    zIndex: 9999
-  })
-};
+  const selectStyles = {
+    container: (base) => ({
+      ...base,
+      width: "100%"
+    }),
+    menu: (base) => ({
+      ...base,
+      width: "100%",
+      maxWidth: "100%"
+    }),
+    option: (base) => ({
+      ...base,
+      whiteSpace: "normal",
+      wordBreak: "break-word"
+    }),
+    menuPortal: (base) => ({
+      ...base,
+      zIndex: 9999
+    })
+  };
 
-const [notif, setNotif] = useState({
-  show: false,
-  message: "",
-  exiting: false
-});
-    const [jenisPajak, setJenisPajak] = useState(""); 
-    const [jenisPemotongan, setJenisPemotongan] = useState("");
-    const [kodeObjekPajak, setKodePajak] = useState("");
-    const [gaji, setGaji] = useState("");
-    const [iuranPensiun, setIuranPensiun] = useState("");
-    const [zakat, setZakat] = useState("");
-    const [jenisPTT, setJenisPTT] = useState("");
-    const [ptkp, setPtkp] = useState("");
-    const [tarif, setTarif] = useState(0);
-    const [skema, setSkema] = useState("gross");
-    const [pph, setPph] = useState(null);
-    const [loading, setLoading] = useState(false);
-    const [masaAwal, setMasaAwal] = useState("");
-    const [hasilTahunan, setHasilTahunan] = useState(null);
-    const [pphTerpotong, setPphTerpotong] = useState("");
-    const [masaAkhir, setMasaAkhir] = useState("");
-    const [biayaJabatan, setBiayaJabatan] = useState("");
-    const [modal, setModal] = useState({
-      open: false,
-      type: "info",
-      title: "",
-      message: "",
-    });
-    
+  const [notif, setNotif] = useState({
+    show: false,
+    message: "",
+    exiting: false
+  });
+  const [jenisPajak, setJenisPajak] = useState("");
+  const [jenisPemotongan, setJenisPemotongan] = useState("");
+  const [kodeObjekPajak, setKodePajak] = useState("");
+  const [gaji, setGaji] = useState("");
+  const [iuranPensiun, setIuranPensiun] = useState("");
+  const [zakat, setZakat] = useState("");
+  const [jenisPTT, setJenisPTT] = useState("");
+  const [ptkp, setPtkp] = useState("");
+  const [tarif, setTarif] = useState(0);
+  const [skema, setSkema] = useState("gross");
+  const [pph, setPph] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [masaAwal, setMasaAwal] = useState("");
+  const [hasilTahunan, setHasilTahunan] = useState(null);
+  const [pphTerpotong, setPphTerpotong] = useState("");
+  const [masaAkhir, setMasaAkhir] = useState("");
+  const [biayaJabatan, setBiayaJabatan] = useState("");
+  const [modal, setModal] = useState({
+    open: false,
+    type: "info",
+    title: "",
+    message: "",
+  });
+
   const [hasil, setHasil] = useState(null);
-      const cleanGaji = Number((gaji || "").replace(/\./g, "")) || 0; 
+  const cleanGaji = Number((gaji || "").replace(/\./g, "")) || 0;
 
-    const cleanIuranPensiun = Number((iuranPensiun || "").replace(/\./g, "")) || 0;
+  const cleanIuranPensiun = Number((iuranPensiun || "").replace(/\./g, "")) || 0;
   const cleanZakat = Number((zakat || "").replace(/\./g, "")) || 0;
 
   const [pakaiAkumulasi, setPakaiAkumulasi] = useState(false);
@@ -71,8 +71,8 @@ const [notif, setNotif] = useState({
     { value: "4", label: "Golongan IV, Perwira Menengah, Perwira Tinggi dan Pejabat Negara" },
   ];
 
-    const [penghasilanTerpotong, setPenghasilanTerpotong] = useState("");
-    const [pakaiPenghasilanTerpotong, setPakaiPenghasilanTerpotong] = useState(false);
+  const [penghasilanTerpotong, setPenghasilanTerpotong] = useState("");
+  const [pakaiPenghasilanTerpotong, setPakaiPenghasilanTerpotong] = useState(false);
   const handlePph23 = () => {
     const bruto = Number((brutoPph23 || "").replace(/\./g, "")) || 0;
     const tarif = Number(tarifPph23) || 0;
@@ -86,25 +86,25 @@ const [notif, setNotif] = useState({
 
     setPph(hasil);
 
-setNotif({
-  show: true,
-  message: "Perhitungan PPh 23 berhasil",
-  exiting: false
-});
+    setNotif({
+      show: true,
+      message: "Perhitungan PPh 23 berhasil",
+      exiting: false
+    });
 
-setTimeout(() => {
-  setNotif((prev) => ({ ...prev, exiting: true }));
-}, 2500);
+    setTimeout(() => {
+      setNotif((prev) => ({ ...prev, exiting: true }));
+    }, 2500);
 
-setTimeout(() => {
-  setNotif({ show: false, message: "", exiting: false });
-}, 3000);
+    setTimeout(() => {
+      setNotif({ show: false, message: "", exiting: false });
+    }, 3000);
   };
 
-    const [kodeObjekPph23, setKodeObjekPph23] = useState("");
-    const [brutoPph23, setBrutoPph23] = useState("");
-    const [tarifPph23, setTarifPph23] = useState("");
-    
+  const [kodeObjekPph23, setKodeObjekPph23] = useState("");
+  const [brutoPph23, setBrutoPph23] = useState("");
+  const [tarifPph23, setTarifPph23] = useState("");
+
   useEffect(() => {
     setJenisPemotongan("");
     setKodePajak("");
@@ -114,36 +114,36 @@ setTimeout(() => {
     setPph(null);
   }, [jenisPajak]);
 
-    const formatRupiah = (angka) => {
-      return new Intl.NumberFormat("id-ID", {
-        style: "currency",
-        currency: "IDR",
-        minimumFractionDigits: 0,
-      }).format(angka || 0);
-    };
+  const formatRupiah = (angka) => {
+    return new Intl.NumberFormat("id-ID", {
+      style: "currency",
+      currency: "IDR",
+      minimumFractionDigits: 0,
+    }).format(angka || 0);
+  };
 
-    const formatAngka = (value) => {
-      const numberString = value.replace(/[^,\d]/g, "").toString();
-      const split = numberString.split(",");
-      const sisa = split[0].length % 3;
-      let rupiah = split[0].substr(0, sisa);
-      const ribuan = split[0].substr(sisa).match(/\d{3}/gi);
-      if (ribuan) {
-        const separator = sisa ? "." : "";
-        rupiah += separator + ribuan.join(".");
-      }
-      return rupiah;
-    };
+  const formatAngka = (value) => {
+    const numberString = value.replace(/[^,\d]/g, "").toString();
+    const split = numberString.split(",");
+    const sisa = split[0].length % 3;
+    let rupiah = split[0].substr(0, sisa);
+    const ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+    if (ribuan) {
+      const separator = sisa ? "." : "";
+      rupiah += separator + ribuan.join(".");
+    }
+    return rupiah;
+  };
 
- const formatPersen = (nilai) => {
-  if (!nilai) return "0";
-  return Number(nilai);
-};
-    const showModal = (type, title, message) => {
-      setModal({ open: true, type, title, message });
-    };
+  const formatPersen = (nilai) => {
+    if (!nilai) return "0";
+    return Number(nilai);
+  };
+  const showModal = (type, title, message) => {
+    setModal({ open: true, type, title, message });
+  };
 
-    const handleHitung = async () => {
+  const handleHitung = async () => {
     if (!jenisPajak) {
       showModal("warning", "Form Belum Lengkap", "Pilih jenis pajak terlebih dahulu");
       return;
@@ -172,20 +172,20 @@ setTimeout(() => {
         return;
       }
 
-  const cleanPenghasilanTerpotong =
-    pakaiPenghasilanTerpotong
-      ? Number((penghasilanTerpotong || "").replace(/\./g, "")) || 0
-      : 0;
+      const cleanPenghasilanTerpotong =
+        pakaiPenghasilanTerpotong
+          ? Number((penghasilanTerpotong || "").replace(/\./g, "")) || 0
+          : 0;
 
-  payload = {
-    jenis_pemotongan: "bulanan",
-    kode_objek_pajak: kodeObjekPajak,
-    gaji: cleanGaji,
-    ptkp,
-    skema,
-    penghasilanKenaPPh21: cleanPenghasilanTerpotong,
-    
-  };
+      payload = {
+        jenis_pemotongan: "bulanan",
+        kode_objek_pajak: kodeObjekPajak,
+        gaji: cleanGaji,
+        ptkp,
+        skema,
+        penghasilanKenaPPh21: cleanPenghasilanTerpotong,
+
+      };
 
     }
 
@@ -209,66 +209,66 @@ setTimeout(() => {
         pphTerpotong: cleanPphTerpotong
       };
     }
-  else if (jenisPemotongan === "final") {
+    else if (jenisPemotongan === "final") {
 
-  if (!cleanGaji || cleanGaji <= 0) {
-    showModal("warning","Form Belum Lengkap","Penghasilan harus diisi");
-    return;
-  }
+      if (!cleanGaji || cleanGaji <= 0) {
+        showModal("warning", "Form Belum Lengkap", "Penghasilan harus diisi");
+        return;
+      }
 
-  const cleanAkumulasi =
-    pakaiAkumulasi
-      ? Number((akumulasiBruto || "").replace(/\./g,"")) || 0
-      : 0;
+      const cleanAkumulasi =
+        pakaiAkumulasi
+          ? Number((akumulasiBruto || "").replace(/\./g, "")) || 0
+          : 0;
 
-  payload = {
-    jenis_pemotongan: "final",
-    kode_objek_pajak: kodeObjekPajak,
-    penghasilan: cleanGaji,
-    akumulasi_bruto: cleanAkumulasi,
-    golongan: golonganPns
-  };
+      payload = {
+        jenis_pemotongan: "final",
+        kode_objek_pajak: kodeObjekPajak,
+        penghasilan: cleanGaji,
+        akumulasi_bruto: cleanAkumulasi,
+        golongan: golonganPns
+      };
 
-  }
+    }
 
-  else if (jenisPemotongan === "tidak_final") {
+    else if (jenisPemotongan === "tidak_final") {
 
-  const cleanPenghasilanTerpotong =
-    pakaiPenghasilanTerpotong
-      ? Number((penghasilanTerpotong || "").replace(/\./g, "")) || 0
-      : 0;
+      const cleanPenghasilanTerpotong =
+        pakaiPenghasilanTerpotong
+          ? Number((penghasilanTerpotong || "").replace(/\./g, "")) || 0
+          : 0;
 
-  if (!kodeObjekPajak || !gaji) {
-    showModal("warning", "Form Belum Lengkap", "Lengkapi data tidak final terlebih dahulu");
-    return;
-  }
+      if (!kodeObjekPajak || !gaji) {
+        showModal("warning", "Form Belum Lengkap", "Lengkapi data tidak final terlebih dahulu");
+        return;
+      }
 
-  if (kodeObjekPajak === "2110003" && !jenisPTT) {
-    showModal("warning", "Form Belum Lengkap", "Pilih jenis objek pajak terlebih dahulu");
-    return;
-  }
+      if (kodeObjekPajak === "2110003" && !jenisPTT) {
+        showModal("warning", "Form Belum Lengkap", "Pilih jenis objek pajak terlebih dahulu");
+        return;
+      }
 
-  const wajibPTKP =
-    kodeObjekPajak === "2110010" ||
-    (kodeObjekPajak === "2110003" && jenisPTT === "bulanan");
+      const wajibPTKP =
+        kodeObjekPajak === "2110010" ||
+        (kodeObjekPajak === "2110003" && jenisPTT === "bulanan");
 
-  if (wajibPTKP && !ptkp) {
-    showModal("warning", "Form Belum Lengkap", "Status PTKP wajib diisi");
-    return;
-  }
+      if (wajibPTKP && !ptkp) {
+        showModal("warning", "Form Belum Lengkap", "Status PTKP wajib diisi");
+        return;
+      }
 
-  payload = {
-    jenis_pemotongan: "tidak_final",
-    kode_objek_pajak: kodeObjekPajak,
-    gaji: cleanGaji,
-    skema,
-    jenis_ptt: jenisPTT,
-    penghasilanKenaPPh21: cleanPenghasilanTerpotong,
-  };
+      payload = {
+        jenis_pemotongan: "tidak_final",
+        kode_objek_pajak: kodeObjekPajak,
+        gaji: cleanGaji,
+        skema,
+        jenis_ptt: jenisPTT,
+        penghasilanKenaPPh21: cleanPenghasilanTerpotong,
+      };
 
-  if (wajibPTKP) payload.ptkp = ptkp;
+      if (wajibPTKP) payload.ptkp = ptkp;
 
-  }
+    }
 
     try {
       setLoading(true);
@@ -280,57 +280,57 @@ setTimeout(() => {
       else if (jenisPemotongan === "final") endpoint = "/pph21-final";
       else if (jenisPemotongan === "tidak_final") endpoint = "/pph21-tidak-final";
 
-   const response = await api.post(endpoint, payload);
+      const response = await api.post(endpoint, payload);
 
-const hasil =
-  response.data?.data?.hasil_perhitungan ??
-  response.data?.hasil_perhitungan ??
-  response.data?.data ??
-  {};
+      const hasil =
+        response.data?.data?.hasil_perhitungan ??
+        response.data?.hasil_perhitungan ??
+        response.data?.data ??
+        {};
 
-setHasil(hasil);
+      setHasil(hasil);
 
-setTarif(
-  Number(
-    hasil?.tarif ??
-    hasil?.tarifEfektif ??
-    hasil?.tarif_efektif ??
-    0
-  )
-);
+      setTarif(
+        Number(
+          hasil?.tarif ??
+          hasil?.tarifEfektif ??
+          hasil?.tarif_efektif ??
+          0
+        )
+      );
       let nilaiPph = 0;
-  if (jenisPemotongan === "tahunan") {
-    setHasilTahunan(hasil);
+      if (jenisPemotongan === "tahunan") {
+        setHasilTahunan(hasil);
 
-    nilaiPph =
-      hasil?.pph21KurangBayar ?? 
-      hasil?.pph21_kurang_bayar ?? 
-      0;
-  } else {
-  nilaiPph =
-    hasil?.pph21Bulanan ??
-    hasil?.pph21_bulanan ??
-    hasil?.pph21 ??
-    hasil?.pajak ??
-    0;
-  }
+        nilaiPph =
+          hasil?.pph21KurangBayar ??
+          hasil?.pph21_kurang_bayar ??
+          0;
+      } else {
+        nilaiPph =
+          hasil?.pph21Bulanan ??
+          hasil?.pph21_bulanan ??
+          hasil?.pph21 ??
+          hasil?.pajak ??
+          0;
+      }
 
-  setPph(Number(nilaiPph));
+      setPph(Number(nilaiPph));
 
 
-  setNotif({
-  show: true,
-  message: "Perhitungan berhasil dilakukan",
-  exiting: false
-});
+      setNotif({
+        show: true,
+        message: "Perhitungan berhasil dilakukan",
+        exiting: false
+      });
 
-setTimeout(() => {
-  setNotif((prev) => ({ ...prev, exiting: true }));
-}, 2500);
+      setTimeout(() => {
+        setNotif((prev) => ({ ...prev, exiting: true }));
+      }, 2500);
 
-setTimeout(() => {
-  setNotif({ show: false, message: "", exiting: false });
-}, 3000);   
+      setTimeout(() => {
+        setNotif({ show: false, message: "", exiting: false });
+      }, 3000);
 
     } catch (error) {
       console.error("Error menghitung pajak:", error);
@@ -338,23 +338,23 @@ setTimeout(() => {
     } finally {
       setLoading(false);
     }
-  };  
+  };
 
-    const ptkpMapping = {
-      "TK/0": 54000000,
-      "TK/1": 58500000,
-      "TK/2": 63000000,
-      "TK/3": 67500000,
-      "K/0": 58500000,
-      "K/1": 63000000,
-      "K/2": 67500000,
-      "K/3": 72000000,
-    };
+  const ptkpMapping = {
+    "TK/0": 54000000,
+    "TK/1": 58500000,
+    "TK/2": 63000000,
+    "TK/3": 67500000,
+    "K/0": 58500000,
+    "K/1": 63000000,
+    "K/2": 67500000,
+    "K/3": 72000000,
+  };
 
-    // const ptkpValue = ptkpMapping[ptkp] || 0;
-  
+  // const ptkpValue = ptkpMapping[ptkp] || 0;
 
-    useEffect(() => {
+
+  useEffect(() => {
     setKodeObjekPph23("");
     setBrutoPph23("");
     setTarifPph23("");
@@ -380,7 +380,7 @@ setTimeout(() => {
     "2410101": { nama: "Dividen", tarif: 15 },
     "2410201": { nama: "Bunga Selain yang Dikenakan PPh Pasal 4 ayat (2)", tarif: 15 },
     "2410301": { nama: "Royalti", tarif: 15 },
-    
+
     "2410401": { nama: "Jasa Teknik", tarif: 2 },
     "2410402": { nama: "Jasa Manajemen", tarif: 2 },
     "2410403": { nama: "Jasa Konsultan", tarif: 2 },
@@ -450,8 +450,8 @@ setTimeout(() => {
     "2410467": { nama: "Jasa Pemasaran dengan Media Voucer Oleh Penyelenggara Voucer", tarif: 2 },
     "2410468": { nama: "Jasa Penyelenggara Layanan Transaksi Pembayaran Terkait dengan Distribusi Voucer Oleh Penyelenggara Voucer dan Penyelenggara Distribusi", tarif: 2 },
     "2410469": { nama: "Jasa Penyelenggara Program Loyalitas dan Penghargaan Pelanggan (Costumer Loyalty/Reward Program) Oleh Penyelenggara Voucer", tarif: 2 },
-    
-  };  
+
+  };
   const opsiPph23 = Object.entries(objekPph23).map(([kode, data]) => ({
     value: kode,
     label: `${kode} - ${data.nama}`,
@@ -459,253 +459,251 @@ setTimeout(() => {
   }));
 
 
-    return (
-      <div className="min-h-screen bg-gray-100 flex flex-col">
+  return (
+    <div className="min-h-screen bg-gray-100 flex flex-col">
 
-        <div className="bg-blue-950 text-blue-100 text-xs">
-          <div className="max-w-7xl mx-auto px-8 py-2 flex justify-between">
-            <div className="flex gap-6">
-              <div className="flex items-center gap-2">
-                <MapPin size={14} />
-                <span>Jl. S. Supriadi No.136, Kota Blitar</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Phone size={14} />
-                <span>0821 4242 2828</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Mail size={14} />
-                <span>admin@rrtc.com</span>
-              </div>
+      <div className="bg-blue-950 text-blue-100 text-xs">
+        <div className="max-w-7xl mx-auto px-8 py-2 flex justify-between">
+          <div className="flex gap-6">
+            <div className="flex items-center gap-2">
+              <MapPin size={14} />
+              <span>Jl. S. Supriadi No.136, Kota Blitar</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Phone size={14} />
+              <span>0821 4242 2828</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Mail size={14} />
+              <span>admin@rrtc.com</span>
             </div>
           </div>
         </div>
+      </div>
 
-        <header className="bg-gradient-to-r from-blue-950 via-blue-900 to-blue-800 text-white shadow-lg">
-          <div className="max-w-7xl mx-auto px-8 py-4 flex items-center gap-4">
-            <div className="bg-white p-2 rounded-xl shadow-md">
-              <img src="src/assets/rrtc.jpeg" className="w-12 h-12 object-contain" />
-            </div>
-            <div>
-              <h1 className="text-lg font-bold">RRCT.ID</h1>
-              <p className="text-sm text-blue-200">Sistem Perhitungan PPh 21</p>
-            </div>
+      <header className="bg-gradient-to-r from-blue-950 via-blue-900 to-blue-800 text-white shadow-lg">
+        <div className="max-w-7xl mx-auto px-8 py-4 flex items-center gap-4">
+          <div className="bg-white p-2 rounded-xl shadow-md">
+            <img src="src/assets/rrtc.jpeg" className="w-12 h-12 object-contain" />
           </div>
-        </header>
+          <div>
+            <h1 className="text-lg font-bold">RRCT.ID</h1>
+            <p className="text-sm text-blue-200">Sistem Perhitungan PPh 21</p>
+          </div>
+        </div>
+      </header>
 
-        <main className="flex-1 px-8 py-12">
-          <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-8">
+      <main className="flex-1 px-8 py-12">
+        <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-8">
 
-            <div className="bg-white rounded-lg shadow-sm border p-6">
-              <label className="text-xs text-gray-500">Jenis Pajak</label>
-              <select
-                value={jenisPajak}
-                onChange={(e) => setJenisPajak(e.target.value)}
-                className="w-full border rounded-md p-2 mt-1 mb-4 text-sm"
-              >
-                <option value="">Pilih Jenis Pajak</option>
-                <option value="pph21">PPh 21</option>
-                <option value="pph23">PPh 23</option>
-              </select>
+          <div className="bg-white rounded-lg shadow-sm border p-6">
+            <label className="text-xs text-gray-500">Jenis Pajak</label>
+            <select
+              value={jenisPajak}
+              onChange={(e) => setJenisPajak(e.target.value)}
+              className="w-full border rounded-md p-2 mt-1 mb-4 text-sm"
+            >
+              <option value="">Pilih Jenis Pajak</option>
+              <option value="pph21">PPh 21</option>
+              <option value="pph23">PPh 23</option>
+            </select>
 
             {jenisPajak === "pph21" && (
-    <>
-      <label className="text-xs text-gray-500">
-        Jenis Pemotongan
-      </label>
-      <select
-        value={jenisPemotongan}
-        onChange={(e) => setJenisPemotongan(e.target.value)}
-        className="w-full border rounded-md p-2 mt-1 mb-4 text-sm"
-      >
-        <option value="">Pilih Jenis Pemotongan</option>
-        <option value="bulanan">Bulanan</option>
-        <option value="tahunan">Tahunan</option>
-        <option value="final">Final</option>
-        <option value="tidak_final">Tidak Final</option>
-      </select>
-    </>
-  )}
-
-            
-      {jenisPemotongan === "tidak_final" && (
-        <>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <label className="text-xs text-gray-500 mb-1">
-                Kode Objek Pajak
-              </label>
-              <select
-                value={kodeObjekPajak}
-                onChange={(e) => {
-                  setKodePajak(e.target.value);
-                  setPtkp("");
-                  setJenisPTT("");
-                }}
-                className="w-full border rounded-md p-2 text-sm"
-              >
-                <option value="">Pilih Kode Pajak</option>
-              <option value="2110003">21-100-03 - Pegawai Tidak Tetap</option>
-              <option value="2110004">21-100-04 - Distributor Pemasaran Berjenjang</option>
-              <option value="2110005">21-100-05 - Agen Asuransi </option>
-              <option value="2110006">21-100-06 - Penjaja Barang Dagangan</option>
-              <option value="2110007">21-100-07 - Tenaga Ahli</option>
-              <option value="2110008">21-100-08 - Seniman</option>
-              <option value="2110009">21-100-09 - Bukan Pegawai Lainnya</option>
-              <option value="2110010">21-100-10 - Imbalan Tidak Teratur Dewan Komisaris / Pengawas</option>
-              <option value="2110011">21-100-11 - Bonus / Tantiem untuk Mantan Pegawai</option>
-              <option value="2110012">21-100-12 - Pegawai yang melakukan Penarikan Uang Pensiun</option>
-              <option value="2110013">21-100-13 - Peserta Kegiatan</option>
-              </select>
-            </div>
-
-            {kodeObjekPajak === "2110003" && (
-              <div>
-                <label className="text-xs text-gray-500 mb-1">
-                  Jenis Objek Pajak
-                </label>
-                <select
-                  value={jenisPTT}
-                  onChange={(e) => setJenisPTT(e.target.value)}
-                  className="w-full border rounded-md p-2 text-sm"
-                >
-                  <option value="">Pilih Jenis Objek Pajak</option>
-                  <option value="harian">Upah Pegawai Tidak Tetap Non Bulanan</option>
-                  <option value="bulanan">Upah Pegawai Tidak Tetap Bulanan</option>
-                </select>
-              </div>
-            )}
-
-            {(kodeObjekPajak === "2110010" ||
-              (kodeObjekPajak === "2110003" && jenisPTT === "bulanan")) && (
-              <div>
-                <label className="text-xs text-gray-500 mb-1">
-                  Status PTKP
-                </label>
-                <select
-                  value={ptkp}
-                  onChange={(e) => setPtkp(e.target.value)}
-                  className="w-full border rounded-md p-2 text-sm"
-                >
-                  <option value="">Pilih Status PTKP</option>
-                  {Object.keys(ptkpMapping).map((key) => (
-                    <option key={key} value={key}>
-                      {key}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            )}
-          </div>
-
-          {kodeObjekPajak === "2110010" && (
-            <div className="flex gap-2 mt-4 mb-4">
-              <button
-                onClick={() => setSkema("gross")}
-                className={`flex-1 py-2 rounded-md text-xs ${
-                  skema === "gross"
-                    ? "bg-blue-800 text-white"
-                    : "bg-gray-200"
-                }`}
-              >
-                Gross
-              </button>
-              <button
-                onClick={() => setSkema("grossUp")}
-                className={`flex-1 py-2 rounded-md text-xs ${
-                  skema === "grossUp"
-                    ? "bg-blue-800 text-white"
-                    : "bg-gray-200"
-                }`}
-              >
-                Gross Up
-              </button>
-            </div>
-          )}
-
-          {/* Penghasilan */}
-          <label className="text-xs text-gray-500 mt-4">
-            Penghasilan
-          </label>
-          <input
-            type="text"
-            value={gaji}
-            onChange={(e) => setGaji(formatAngka(e.target.value))}
-            className="w-full border rounded-md p-2 mt-1 mb-3 text-sm"
-          />
-
-          {/* Tambahan untuk Komisaris */}
-          {kodeObjekPajak === "2110010" && (
-            <>
-              <div className="flex items-center gap-2 mb-2">
-                <input
-                  type="checkbox"
-                  checked={pakaiPenghasilanTerpotong}
-                  onChange={(e) =>
-                    setPakaiPenghasilanTerpotong(e.target.checked)
-                  }
-                />
+              <>
                 <label className="text-xs text-gray-500">
-                  Ada penghasilan yang telah dipotong PPh21 sebelumnya
+                  Jenis Pemotongan
                 </label>
-              </div>
+                <select
+                  value={jenisPemotongan}
+                  onChange={(e) => setJenisPemotongan(e.target.value)}
+                  className="w-full border rounded-md p-2 mt-1 mb-4 text-sm"
+                >
+                  <option value="">Pilih Jenis Pemotongan</option>
+                  <option value="bulanan">Bulanan</option>
+                  <option value="tahunan">Tahunan</option>
+                  <option value="final">Final</option>
+                  <option value="tidak_final">Tidak Final</option>
+                </select>
+              </>
+            )}
 
-              {pakaiPenghasilanTerpotong && (
-                <>
-                  <label className="text-sm">
-                    Penghasilan yang telah dipotong PPh21 pada masa pajak yang sama
-                  </label>
 
-                  <input
-                    type="text"
-                    value={penghasilanTerpotong}
-                    onChange={(e) =>
-                      setPenghasilanTerpotong(formatAngka(e.target.value))
-                    }
-                    className="w-full border rounded-md p-2 mt-1 mb-4 text-sm"
-                  />
-                </>
-              )}
-            </>
-          )}
-        </>
-      )}
+            {jenisPemotongan === "tidak_final" && (
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <label className="text-xs text-gray-500 mb-1">
+                      Kode Objek Pajak
+                    </label>
+                    <select
+                      value={kodeObjekPajak}
+                      onChange={(e) => {
+                        setKodePajak(e.target.value);
+                        setPtkp("");
+                        setJenisPTT("");
+                      }}
+                      className="w-full border rounded-md p-2 text-sm"
+                    >
+                      <option value="">Pilih Kode Pajak</option>
+                      <option value="2110003">21-100-03 - Pegawai Tidak Tetap</option>
+                      <option value="2110004">21-100-04 - Distributor Pemasaran Berjenjang</option>
+                      <option value="2110005">21-100-05 - Agen Asuransi </option>
+                      <option value="2110006">21-100-06 - Penjaja Barang Dagangan</option>
+                      <option value="2110007">21-100-07 - Tenaga Ahli</option>
+                      <option value="2110008">21-100-08 - Seniman</option>
+                      <option value="2110009">21-100-09 - Bukan Pegawai Lainnya</option>
+                      <option value="2110010">21-100-10 - Imbalan Tidak Teratur Dewan Komisaris / Pengawas</option>
+                      <option value="2110011">21-100-11 - Bonus / Tantiem untuk Mantan Pegawai</option>
+                      <option value="2110012">21-100-12 - Pegawai yang melakukan Penarikan Uang Pensiun</option>
+                      <option value="2110013">21-100-13 - Peserta Kegiatan</option>
+                    </select>
+                  </div>
+
+                  {kodeObjekPajak === "2110003" && (
+                    <div>
+                      <label className="text-xs text-gray-500 mb-1">
+                        Jenis Objek Pajak
+                      </label>
+                      <select
+                        value={jenisPTT}
+                        onChange={(e) => setJenisPTT(e.target.value)}
+                        className="w-full border rounded-md p-2 text-sm"
+                      >
+                        <option value="">Pilih Jenis Objek Pajak</option>
+                        <option value="harian">Upah Pegawai Tidak Tetap Non Bulanan</option>
+                        <option value="bulanan">Upah Pegawai Tidak Tetap Bulanan</option>
+                      </select>
+                    </div>
+                  )}
+
+                  {(kodeObjekPajak === "2110010" ||
+                    (kodeObjekPajak === "2110003" && jenisPTT === "bulanan")) && (
+                      <div>
+                        <label className="text-xs text-gray-500 mb-1">
+                          Status PTKP
+                        </label>
+                        <select
+                          value={ptkp}
+                          onChange={(e) => setPtkp(e.target.value)}
+                          className="w-full border rounded-md p-2 text-sm"
+                        >
+                          <option value="">Pilih Status PTKP</option>
+                          {Object.keys(ptkpMapping).map((key) => (
+                            <option key={key} value={key}>
+                              {key}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    )}
+                </div>
+
+                {kodeObjekPajak === "2110010" && (
+                  <div className="flex gap-2 mt-4 mb-4">
+                    <button
+                      onClick={() => setSkema("gross")}
+                      className={`flex-1 py-2 rounded-md text-xs ${skema === "gross"
+                          ? "bg-blue-800 text-white"
+                          : "bg-gray-200"
+                        }`}
+                    >
+                      Gross
+                    </button>
+                    <button
+                      onClick={() => setSkema("grossUp")}
+                      className={`flex-1 py-2 rounded-md text-xs ${skema === "grossUp"
+                          ? "bg-blue-800 text-white"
+                          : "bg-gray-200"
+                        }`}
+                    >
+                      Gross Up
+                    </button>
+                  </div>
+                )}
+
+                {/* Penghasilan */}
+                <label className="text-xs text-gray-500 mt-4">
+                  Penghasilan
+                </label>
+                <input
+                  type="text"
+                  value={gaji}
+                  onChange={(e) => setGaji(formatAngka(e.target.value))}
+                  className="w-full border rounded-md p-2 mt-1 mb-3 text-sm"
+                />
+
+                {/* Tambahan untuk Komisaris */}
+                {kodeObjekPajak === "2110010" && (
+                  <>
+                    <div className="flex items-center gap-2 mb-2">
+                      <input
+                        type="checkbox"
+                        checked={pakaiPenghasilanTerpotong}
+                        onChange={(e) =>
+                          setPakaiPenghasilanTerpotong(e.target.checked)
+                        }
+                      />
+                      <label className="text-xs text-gray-500">
+                        Ada penghasilan yang telah dipotong PPh21 sebelumnya
+                      </label>
+                    </div>
+
+                    {pakaiPenghasilanTerpotong && (
+                      <>
+                        <label className="text-sm">
+                          Penghasilan yang telah dipotong PPh21 pada masa pajak yang sama
+                        </label>
+
+                        <input
+                          type="text"
+                          value={penghasilanTerpotong}
+                          onChange={(e) =>
+                            setPenghasilanTerpotong(formatAngka(e.target.value))
+                          }
+                          className="w-full border rounded-md p-2 mt-1 mb-4 text-sm"
+                        />
+                      </>
+                    )}
+                  </>
+                )}
+              </>
+            )}
             {jenisPemotongan === "bulanan" && (
-              <> 
+              <>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
-                <div className="flex flex-col">
-                  <label className="text-xs text-gray-500 mb-1">
-                    Kode Objek Pajak
-                  </label>
-                  <select
-                    value={kodeObjekPajak}
-                    onChange={(e) => setKodePajak(e.target.value)}
-                    className="w-full border rounded-md p-2 text-sm"
-                  >
-                    <option value="">Pilih Kode Objek Pajak</option>
-                    <option value="2110001">21-100-1 Pegawai Tetap</option>
-                    <option value="2110002">21-100-2 Penerima Pensiun Berkala</option>
-                  </select>
-                </div>
+                  <div className="flex flex-col">
+                    <label className="text-xs text-gray-500 mb-1">
+                      Kode Objek Pajak
+                    </label>
+                    <select
+                      value={kodeObjekPajak}
+                      onChange={(e) => setKodePajak(e.target.value)}
+                      className="w-full border rounded-md p-2 text-sm"
+                    >
+                      <option value="">Pilih Kode Objek Pajak</option>
+                      <option value="2110001">21-100-1 Pegawai Tetap</option>
+                      <option value="2110002">21-100-2 Penerima Pensiun Berkala</option>
+                    </select>
+                  </div>
 
-                <div className="flex flex-col">
-                  <label className="text-xs text-gray-500 mb-1">
-                    Status PTKP
-                  </label>
-                  <select
-                    value={ptkp}
-                    onChange={(e) => setPtkp(e.target.value)}
-                    className="w-full border rounded-md p-2 text-sm"
-                  >
-                    <option value="">Pilih Status PTKP</option>
-                    {Object.keys(ptkpMapping).map((key) => (
-                      <option key={key} value={key}>{key}</option>
-                    ))}
-                  </select>
+                  <div className="flex flex-col">
+                    <label className="text-xs text-gray-500 mb-1">
+                      Status PTKP
+                    </label>
+                    <select
+                      value={ptkp}
+                      onChange={(e) => setPtkp(e.target.value)}
+                      className="w-full border rounded-md p-2 text-sm"
+                    >
+                      <option value="">Pilih Status PTKP</option>
+                      {Object.keys(ptkpMapping).map((key) => (
+                        <option key={key} value={key}>{key}</option>
+                      ))}
+                    </select>
+                  </div>
+
                 </div>
-                
-              </div>
 
                 <label className="text-xs text-gray-500 mt-4">
                   Gaji  Bulanan
@@ -726,39 +724,37 @@ setTimeout(() => {
                     Ada penghasilan yang telah dipotong PPh21 sebelumnya
                   </label>
                 </div>
-                  {pakaiPenghasilanTerpotong && (
-                    <>
-                      <label className="text-sm">
-                        Penghasilan yang telah dipotong PPh21 pada masa pajak yang sama
-                      </label>
+                {pakaiPenghasilanTerpotong && (
+                  <>
+                    <label className="text-sm">
+                      Penghasilan yang telah dipotong PPh21 pada masa pajak yang sama
+                    </label>
 
-                      <input
-                        type="text"
-                        value={penghasilanTerpotong}
-                        onChange={(e) => setPenghasilanTerpotong(formatAngka(e.target.value))}
-                        className="w-full border rounded-md p-2 mt-1 mb-4 text-sm"
-                      />
-                    </>
-                  )}
+                    <input
+                      type="text"
+                      value={penghasilanTerpotong}
+                      onChange={(e) => setPenghasilanTerpotong(formatAngka(e.target.value))}
+                      className="w-full border rounded-md p-2 mt-1 mb-4 text-sm"
+                    />
+                  </>
+                )}
 
                 <div className="flex gap-2 mb-4">
                   <button
                     onClick={() => setSkema("gross")}
-                    className={`flex-1 py-2 rounded-md text-xs ${
-                      skema === "gross"
+                    className={`flex-1 py-2 rounded-md text-xs ${skema === "gross"
                         ? "bg-blue-800 text-white"
                         : "bg-gray-200"
-                    }`}
+                      }`}
                   >
                     Gross
                   </button>
                   <button
-                    onClick={() => setSkema("grossUp")}   
-                    className={`flex-1 py-2 rounded-md text-xs ${
-                      skema === "grossUp"
+                    onClick={() => setSkema("grossUp")}
+                    className={`flex-1 py-2 rounded-md text-xs ${skema === "grossUp"
                         ? "bg-blue-800 text-white"
                         : "bg-gray-200"
-                    }`}
+                      }`}
                   >
                     Gross Up
                   </button>
@@ -766,290 +762,290 @@ setTimeout(() => {
               </>
             )}
 
-          {jenisPemotongan === "tahunan" && (
-            <>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {jenisPemotongan === "tahunan" && (
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
-              <div>
-                <label className="text-xs text-gray-500 mb-1">
-                  Status PTKP
-                </label>
-                <select
-                  value={ptkp}
-                  onChange={(e) => setPtkp(e.target.value)}
-                  className="w-full border rounded-md p-2 text-sm mb-4"
-                >
-                  <option value="">Pilih Status PTKP</option>
-                  {Object.keys(ptkpMapping).map((key) => (
-                    <option key={key} value={key}>{key}</option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="text-xs text-gray-500 mt-4">
-                  Gaji/Pensiunan/Bruto
-                </label>
-                <input
-                  type="text"
-                  value={gaji}
-                  onChange={(e) => setGaji(formatAngka(e.target.value))}
-                  className="w-full border rounded-md p-2 mt-1 mb-4 text-sm"
-                />
-              </div>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="text-xs text-gray-500">
-                    Iuran Pensiun
-                  </label>
-                  <input
-                    type="text"
-                    value={iuranPensiun}
-                    onChange={(e) => setIuranPensiun(formatAngka(e.target.value))}
-                    className="w-full border rounded-md p-2 mt-1 mb-4 text-sm"
-                  />
-                </div>
-                <div>
-                  <label className="text-xs text-gray-500">
-                    Biaya Jabatan
-                  </label>
-                  <input
-                    type="text"
-                    value={biayaJabatan}
-                    onChange={(e) => setBiayaJabatan(formatAngka(e.target.value))}
-                    className="w-full border rounded-md p-2 mt-1 mb-4 text-sm"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="text-xs text-gray-500">
-                Zakat
-              </label>
-              <input
-                type="text"
-                value={zakat}
-                onChange={(e) => setZakat(formatAngka(e.target.value))}
-                className="w-full border rounded-md p-2 mt-1 mb-4 text-sm"
-              />
-                </div>
-                <div>
-                  <label className="text-xs text-gray-500">
-                Pph 21 Sudah Terpotong
-              </label>
-              <input
-                type="text"
-                value={pphTerpotong}
-                onChange={(e) => setPphTerpotong(formatAngka(e.target.value))}
-                className="w-full border rounded-md p-2 mt-1 mb-4 text-sm"
-              />
-                </div>
-                
-                
-              </div>
-
-              <div className="mb-4">
-                <label className="text-gray-500 text-xs">Masa Penghasilan</label>
-            <div className="mb-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-xs text-gray-500 mb-1">
+                      Status PTKP
+                    </label>
                     <select
-                      value={masaAwal}
-                      onChange={(e) => setMasaAwal(e.target.value)}
-                      className="w-full border rounded-md p-2 text-sm"
+                      value={ptkp}
+                      onChange={(e) => setPtkp(e.target.value)}
+                      className="w-full border rounded-md p-2 text-sm mb-4"
                     >
-                      <option value="">Masa Awal</option>
-                      <option value="1">Januari</option>
-                      <option value="2">Februari</option>
-                      <option value="3">Maret</option>
-                      <option value="4">April</option>
-                      <option value="5">Mei</option>
-                      <option value="6">Juni</option>
-                      <option value="7">Juli</option>
-                      <option value="8">Agustus</option>
-                      <option value="9">September</option>
-                      <option value="10">Oktober</option>
-                      <option value="11">November</option>
-                      <option value="12">Desember</option>
-                    </select>
-
-                    <select
-                      value={masaAkhir}
-                      onChange={(e) => setMasaAkhir(e.target.value)}
-                      className="w-full border rounded-md p-2 text-sm"
-                    >
-                      <option value="">Masa Akhir</option>
-                      <option value="1">Januari</option>
-                      <option value="2">Februari</option>
-                      <option value="3">Maret</option>
-                      <option value="4">April</option>
-                      <option value="5">Mei</option>
-                      <option value="6">Juni</option>
-                      <option value="7">Juli</option>
-                      <option value="8">Agustus</option>
-                      <option value="9">September</option>
-                      <option value="10">Oktober</option>
-                      <option value="11">November</option>
-                      <option value="12">Desember</option>
+                      <option value="">Pilih Status PTKP</option>
+                      {Object.keys(ptkpMapping).map((key) => (
+                        <option key={key} value={key}>{key}</option>
+                      ))}
                     </select>
                   </div>
+                  <div>
+                    <label className="text-xs text-gray-500 mt-4">
+                      Gaji/Pensiunan/Bruto
+                    </label>
+                    <input
+                      type="text"
+                      value={gaji}
+                      onChange={(e) => setGaji(formatAngka(e.target.value))}
+                      className="w-full border rounded-md p-2 mt-1 mb-4 text-sm"
+                    />
+                  </div>
                 </div>
-              </div>
-            </>
-          )}
-                      {jenisPajak === "pph21" && jenisPemotongan && (
-    <>
-            {jenisPemotongan && (
-    <>
-            {jenisPemotongan === "final" && (
-            <>
-            <label className="text-xs text-gray-500">Kode Objek Pajak</label>
-            <select
-              value={kodeObjekPajak}
-              onChange={(e) => {
-                setKodePajak(e.target.value);
-                setPakaiAkumulasi(false);
-                setAkumulasiBruto("");
-                setGolonganPns("");
-              }}
-              className="w-full border rounded-md p-2 text-sm"
-            >
-              <option value="">Pilih Kode Pajak</option>
-            <option value="2140101">
-            21-401-01 Uang Pesangon yang Dibayarkan Sekaligus
-            </option>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-xs text-gray-500">
+                      Iuran Pensiun
+                    </label>
+                    <input
+                      type="text"
+                      value={iuranPensiun}
+                      onChange={(e) => setIuranPensiun(formatAngka(e.target.value))}
+                      className="w-full border rounded-md p-2 mt-1 mb-4 text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs text-gray-500">
+                      Biaya Jabatan
+                    </label>
+                    <input
+                      type="text"
+                      value={biayaJabatan}
+                      onChange={(e) => setBiayaJabatan(formatAngka(e.target.value))}
+                      className="w-full border rounded-md p-2 mt-1 mb-4 text-sm"
+                    />
+                  </div>
+                </div>
 
-            <option value="2140102">
-            21-401-02 Uang Manfaat Pensiun, Tunjangan Hari Tua
-            </option>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-xs text-gray-500">
+                      Zakat
+                    </label>
+                    <input
+                      type="text"
+                      value={zakat}
+                      onChange={(e) => setZakat(formatAngka(e.target.value))}
+                      className="w-full border rounded-md p-2 mt-1 mb-4 text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs text-gray-500">
+                      Pph 21 Sudah Terpotong
+                    </label>
+                    <input
+                      type="text"
+                      value={pphTerpotong}
+                      onChange={(e) => setPphTerpotong(formatAngka(e.target.value))}
+                      className="w-full border rounded-md p-2 mt-1 mb-4 text-sm"
+                    />
+                  </div>
 
-            <option value="2140201">
-            21-402-01 Honor PNS / TNI / POLRI (APBN/APBD)
-            </option>
-            </select>
 
-            <label className="text-xs text-gray-500 mt-4">Penghasilan Bruto</label>
-            <input
-              type="text"
-              value={gaji}
-              onChange={(e) => setGaji(formatAngka(e.target.value))}
-              className="w-full border rounded-md p-2 mt-1 mb-3 text-sm"
-            />
+                </div>
 
-            {/* KHUSUS 2140101 & 2140102 */}
-            {(kodeObjekPajak === "2140101" || kodeObjekPajak === "2140102") && (
-            <>
-            <div className="flex items-center gap-2 mb-2">
-              <input
-                type="checkbox"
-                checked={pakaiAkumulasi}
-                onChange={(e) => setPakaiAkumulasi(e.target.checked)}
-              />
-              <label className="text-xs text-gray-500">
-                Akumulasi Penghasilan Bruto Sebelumnya
-              </label>
-            </div>
+                <div className="mb-4">
+                  <label className="text-gray-500 text-xs">Masa Penghasilan</label>
+                  <div className="mb-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <select
+                        value={masaAwal}
+                        onChange={(e) => setMasaAwal(e.target.value)}
+                        className="w-full border rounded-md p-2 text-sm"
+                      >
+                        <option value="">Masa Awal</option>
+                        <option value="1">Januari</option>
+                        <option value="2">Februari</option>
+                        <option value="3">Maret</option>
+                        <option value="4">April</option>
+                        <option value="5">Mei</option>
+                        <option value="6">Juni</option>
+                        <option value="7">Juli</option>
+                        <option value="8">Agustus</option>
+                        <option value="9">September</option>
+                        <option value="10">Oktober</option>
+                        <option value="11">November</option>
+                        <option value="12">Desember</option>
+                      </select>
 
-            {pakaiAkumulasi && (
-            <>
-            <label className="text-sm ">
-            Akumulasi Penghasilan Bruto Sebelumnya
-            </label>
-            <input
-              type="text"
-              value={akumulasiBruto}
-              onChange={(e) => setAkumulasiBruto(formatAngka(e.target.value))}
-              className="w-full border rounded-md p-2 mt-1 mb-3 text-sm"
-            />
-            </>
+                      <select
+                        value={masaAkhir}
+                        onChange={(e) => setMasaAkhir(e.target.value)}
+                        className="w-full border rounded-md p-2 text-sm"
+                      >
+                        <option value="">Masa Akhir</option>
+                        <option value="1">Januari</option>
+                        <option value="2">Februari</option>
+                        <option value="3">Maret</option>
+                        <option value="4">April</option>
+                        <option value="5">Mei</option>
+                        <option value="6">Juni</option>
+                        <option value="7">Juli</option>
+                        <option value="8">Agustus</option>
+                        <option value="9">September</option>
+                        <option value="10">Oktober</option>
+                        <option value="11">November</option>
+                        <option value="12">Desember</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </>
             )}
-            </>
+            {jenisPajak === "pph21" && jenisPemotongan && (
+              <>
+                {jenisPemotongan && (
+                  <>
+                    {jenisPemotongan === "final" && (
+                      <>
+                        <label className="text-xs text-gray-500">Kode Objek Pajak</label>
+                        <select
+                          value={kodeObjekPajak}
+                          onChange={(e) => {
+                            setKodePajak(e.target.value);
+                            setPakaiAkumulasi(false);
+                            setAkumulasiBruto("");
+                            setGolonganPns("");
+                          }}
+                          className="w-full border rounded-md p-2 text-sm"
+                        >
+                          <option value="">Pilih Kode Pajak</option>
+                          <option value="2140101">
+                            21-401-01 Uang Pesangon yang Dibayarkan Sekaligus
+                          </option>
+
+                          <option value="2140102">
+                            21-401-02 Uang Manfaat Pensiun, Tunjangan Hari Tua
+                          </option>
+
+                          <option value="2140201">
+                            21-402-01 Honor PNS / TNI / POLRI (APBN/APBD)
+                          </option>
+                        </select>
+
+                        <label className="text-xs text-gray-500 mt-4">Penghasilan Bruto</label>
+                        <input
+                          type="text"
+                          value={gaji}
+                          onChange={(e) => setGaji(formatAngka(e.target.value))}
+                          className="w-full border rounded-md p-2 mt-1 mb-3 text-sm"
+                        />
+
+                        {/* KHUSUS 2140101 & 2140102 */}
+                        {(kodeObjekPajak === "2140101" || kodeObjekPajak === "2140102") && (
+                          <>
+                            <div className="flex items-center gap-2 mb-2">
+                              <input
+                                type="checkbox"
+                                checked={pakaiAkumulasi}
+                                onChange={(e) => setPakaiAkumulasi(e.target.checked)}
+                              />
+                              <label className="text-xs text-gray-500">
+                                Akumulasi Penghasilan Bruto Sebelumnya
+                              </label>
+                            </div>
+
+                            {pakaiAkumulasi && (
+                              <>
+                                <label className="text-sm ">
+                                  Akumulasi Penghasilan Bruto Sebelumnya
+                                </label>
+                                <input
+                                  type="text"
+                                  value={akumulasiBruto}
+                                  onChange={(e) => setAkumulasiBruto(formatAngka(e.target.value))}
+                                  className="w-full border rounded-md p-2 mt-1 mb-3 text-sm"
+                                />
+                              </>
+                            )}
+                          </>
+                        )}
+
+
+                        {kodeObjekPajak === "2140201" && (
+                          <>
+                            <label className="text-xs text-gray-500 mt-3">
+                              Golongan
+                            </label>
+                            <Select
+                              options={golonganOptions}
+                              placeholder="Pilih Golongan"
+                              isSearchable
+                              className="w-full text-sm mb-4"
+                              menuPortalTarget={document.body}
+                              styles={selectStyles}
+                              onChange={(selected) => {
+                                setGolonganPns(selected?.value || "")
+                              }}
+                            />
+                          </>
+                        )}
+                      </>
+                    )}
+                    <button
+                      onClick={handleHitung}
+                      disabled={loading}
+                      className="w-full bg-blue-900 hover:bg-blue-950 text-white py-2 rounded-md text-sm font-semibold"
+                    >
+                      {loading ? "Memproses..." : "Hitung Pajak"}
+                    </button>
+                  </>
+                )}
+              </>
+
+
             )}
 
 
-            {kodeObjekPajak === "2140201" && (
-            <>
-            <label className="text-xs text-gray-500 mt-3">
-            Golongan
-            </label>
-          <Select
-            options={golonganOptions}
-            placeholder="Pilih Golongan"
-            isSearchable
-            className="w-full text-sm mb-4"
-            menuPortalTarget={document.body}
-            styles={selectStyles}
-            onChange={(selected)=>{
-              setGolonganPns(selected?.value || "")
-            }}
-          />
-            </>
+
+
+
+            {jenisPajak === "pph23" && (
+              <>
+                <label className="text-xs text-gray-500">Kode Objek Pajak</label>
+                <Select
+                  options={opsiPph23}
+                  placeholder="Pilih Kode Objek Pajak"
+                  isSearchable
+                  className="w-full text-sm mb-4"
+                  menuPortalTarget={document.body}
+                  styles={selectStyles}
+                  onChange={(selected) => {
+                    setKodeObjekPph23(selected?.value || "");
+                    setTarifPph23(selected?.tarif || 0);
+                  }}
+                />
+                <label className="text-xs text-gray-500">Penghasilan Bruto</label>
+                <input
+                  type="text"
+                  value={brutoPph23}
+                  onChange={(e) => setBrutoPph23(formatAngka(e.target.value))}
+                  className="w-full border rounded-md p-2 mt-1 mb-4 text-sm"
+                />
+
+                <label className="text-xs text-gray-500">Tarif (%)</label>
+                <input
+                  type="text"
+                  value={tarifPph23 ? `${tarifPph23}%` : ""}
+                  readOnly
+                  className="w-full border rounded-md p-2 mt-1 mb-4 text-sm bg-gray-100"
+                />
+
+                <button
+                  onClick={handleHitung}
+                  disabled={loading}
+                  className="w-full bg-blue-900 hover:bg-blue-950 text-white py-2 rounded-md text-sm font-semibold"
+                >
+                  {loading ? "Memproses..." : "Hitung Pajak"}
+                </button>
+              </>
             )}
-            </>
-            )}
-            <button
-              onClick={handleHitung}
-              disabled={loading}
-              className="w-full bg-blue-900 hover:bg-blue-950 text-white py-2 rounded-md text-sm font-semibold"
-            >
-              {loading ? "Memproses..." : "Hitung Pajak"}
-            </button>
-          </>
-        )}
-    </>
-
-    
-  )}
-
-    
+          </div>
 
 
-
-        {jenisPajak === "pph23" && (
-        <>
-        <label className="text-xs text-gray-500">Kode Objek Pajak</label>
-      <Select
-        options={opsiPph23}
-        placeholder="Pilih Kode Objek Pajak"
-        isSearchable
-        className="w-full text-sm mb-4"
-        menuPortalTarget={document.body}
-        styles={selectStyles}
-        onChange={(selected) => {
-          setKodeObjekPph23(selected?.value || "");
-          setTarifPph23(selected?.tarif || 0);
-        }}
-      />
-          <label className="text-xs text-gray-500">Penghasilan Bruto</label>
-          <input
-            type="text"
-            value={brutoPph23}
-            onChange={(e) => setBrutoPph23(formatAngka(e.target.value))}
-            className="w-full border rounded-md p-2 mt-1 mb-4 text-sm"
-          />
-
-          <label className="text-xs text-gray-500">Tarif (%)</label>
-          <input
-            type="text"
-            value={tarifPph23 ? `${tarifPph23}%` : ""}
-            readOnly
-            className="w-full border rounded-md p-2 mt-1 mb-4 text-sm bg-gray-100"
-          />
-
-          <button
-            onClick={handleHitung}
-            disabled={loading}
-            className="w-full bg-blue-900 hover:bg-blue-950 text-white py-2 rounded-md text-sm font-semibold"
-          >
-            {loading ? "Memproses..." : "Hitung Pajak"}
-          </button>
-          </>
-          )}
-    </div>
-
-
-    {jenisPajak === "pph21" && (
-     <div className="bg-white rounded-lg shadow-sm border p-6 w-full max-w-full">
+          {jenisPajak === "pph21" && (
+            <div className="bg-white rounded-lg shadow-sm border p-6 w-full max-w-full">
               <h3 className="text-sm font-semibold text-gray-700 mb-5">
                 Ringkasan
               </h3>
@@ -1059,176 +1055,176 @@ setTimeout(() => {
                   Hasil akan muncul setelah perhitungan
                 </p>
               ) : (
-              <>
-    <div className="space-y-2 text-xs mb-4">
+                <>
+                  <div className="space-y-2 text-xs mb-4">
 
-      <div className="flex justify-between">
-        <span>Jenis Pemotongan</span>
-        <span className="capitalize font-medium">{jenisPemotongan}</span>
-      </div>
+                    <div className="flex justify-between">
+                      <span>Jenis Pemotongan</span>
+                      <span className="capitalize font-medium">{jenisPemotongan}</span>
+                    </div>
 
-    {jenisPemotongan === "bulanan" && (
-    <>
-      <div className="flex justify-between">
-        <span>DPP</span>
-    <span>{formatRupiah(hasil?.dpp ?? 0)}</span>
-      </div>
+                    {jenisPemotongan === "bulanan" && (
+                      <>
+                        <div className="flex justify-between">
+                          <span>DPP</span>
+                          <span>{formatRupiah(hasil?.dpp ?? 0)}</span>
+                        </div>
 
-  {(kodeObjekPajak === "2101005" || kodeObjekPajak === "2101003") && pakaiPenghasilanTerpotong && (
-    <div className="flex justify-between text-gray-600">
-      <span>Penghasilan Telah Dipotong</span>
-      <span>{formatRupiah(cleanPenghasilanTerpotong)}</span>
-    </div>
-  )}
-    <div className="flex justify-between">
-    <span>Tarif Efektif</span>
-    <span>{formatPersen(tarif)}</span>
-  </div>
-    </>
-  )}
+                        {(kodeObjekPajak === "2101005" || kodeObjekPajak === "2101003") && pakaiPenghasilanTerpotong && (
+                          <div className="flex justify-between text-gray-600">
+                            <span>Penghasilan Telah Dipotong</span>
+                            <span>{formatRupiah(cleanPenghasilanTerpotong)}</span>
+                          </div>
+                        )}
+                        <div className="flex justify-between">
+                          <span>Tarif Efektif</span>
+                          <span>{formatPersen(tarif)}</span>
+                        </div>
+                      </>
+                    )}
 
-  {jenisPemotongan === "tahunan" && hasilTahunan && (
-    <>
-      <div className="flex justify-between">
-        <span>Penghasilan Bruto</span>
-        <span>{formatRupiah(hasilTahunan.bruto)}</span>
-      </div>
+                    {jenisPemotongan === "tahunan" && hasilTahunan && (
+                      <>
+                        <div className="flex justify-between">
+                          <span>Penghasilan Bruto</span>
+                          <span>{formatRupiah(hasilTahunan.bruto)}</span>
+                        </div>
 
-      <div className="flex justify-between">
-        <span>Pengurangan</span>
-        <span>{formatRupiah(hasilTahunan.pengurangan)}</span>
-      </div>
+                        <div className="flex justify-between">
+                          <span>Pengurangan</span>
+                          <span>{formatRupiah(hasilTahunan.pengurangan)}</span>
+                        </div>
 
-      <div className="flex justify-between">
-        <span>Penghasilan Netto</span>
-        <span>{formatRupiah(hasilTahunan.netto)}</span>
-      </div>
+                        <div className="flex justify-between">
+                          <span>Penghasilan Netto</span>
+                          <span>{formatRupiah(hasilTahunan.netto)}</span>
+                        </div>
 
-  {/* <div className="flex justify-between">
+                        {/* <div className="flex justify-between">
         <span>PPh Pasal 21 Terutang</span>
         <span>{formatRupiah(hasilTahunan.pph21Terutang)}</span>
       </div> */}
-      <div className="flex justify-between">
-        <span>PPh Pasal 21 Sudah Dipotong</span>
-        <span>{formatRupiah(hasilTahunan.pph21SudahDipotong)}</span>
-      </div>
+                        <div className="flex justify-between">
+                          <span>PPh Pasal 21 Sudah Dipotong</span>
+                          <span>{formatRupiah(hasilTahunan.pph21SudahDipotong)}</span>
+                        </div>
 
-    
-    </>
-  )}
 
-      {jenisPemotongan === "final" && (
-                    <>
+                      </>
+                    )}
+
+                    {jenisPemotongan === "final" && (
+                      <>
+                        <div className="flex justify-between">
+                          <span>DPP</span>
+                          <span>{formatRupiah(hasil?.dpp ?? 0)}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Tarif</span>
+                          <span>{formatPersen(tarif)}</span>
+                        </div>
+                      </>
+                    )}
+
+                    {jenisPemotongan === "tidak_final" && (
+                      <>
+                        <div className="flex justify-between">
+                          <span>DPP</span>
+                          <span>{formatRupiah(hasil?.dpp)}</span>
+                        </div>
+
+                        <div className="flex justify-between">
+                          <span>Tarif</span>
+                          <span>{formatPersen(hasil?.tarif)}</span>
+                        </div>
+
+                      </>
+                    )}
+                  </div>
+                  <div className="bg-blue-50 border border-blue-100 rounded-md p-4 text-center">
+                    <p className="text-xs text-gray-500">
+                      {jenisPajak === "pph21" ? "PPh 21" : "PPh 23"}
+                    </p>
+                    <p className="text-2xl font-bold text-blue-900">
+                      {formatRupiah(pph)}
+                    </p>
+                  </div>
+                </>
+              )}
+
+            </div>
+          )}
+
+          {jenisPajak === "pph23" && (
+            <div className="bg-white rounded-lg shadow-sm border p-6">
+              <h3 className="text-sm font-semibold text-gray-700 mb-5">
+                Ringkasan
+              </h3>
+
+              {pph === null && !loading ? (
+                <p className="text-xs text-gray-400">
+                  Hasil akan muncul setelah perhitungan
+                </p>
+              ) : (
+                <>
+                  <div className="space-y-2 text-xs mb-4">
+
                     <div className="flex justify-between">
-                      <span>DPP</span>
-                      <span>{formatRupiah(hasil?.dpp ?? 0)}</span>
+                      <span>Kode Objek Pajak</span>
+                      <span className="font-medium">{kodeObjekPph23}</span>
                     </div>
-                      <div className="flex justify-between">
-                        <span>Tarif</span>
-                        <span>{formatPersen(tarif)}</span>
-                      </div>
-                    </>
-                  )}
 
-                  {jenisPemotongan === "tidak_final" && (
-                    <>
                     <div className="flex justify-between">
-                        <span>DPP</span>
-                        <span>{formatRupiah(hasil?.dpp)}</span>
-                      </div>
+                      <span>Penghasilan Bruto</span>
+                      <span>{formatRupiah(Number((brutoPph23 || "").replace(/\./g, "")))}</span>
+                    </div>
 
-                      <div className="flex justify-between">
-                        <span>Tarif</span>
-                      <span>{formatPersen(hasil?.tarif)}</span>  
-                      </div>
+                    <div className="flex justify-between">
+                      <span>Tarif</span>
+                      <span>{Number(tarifPph23).toFixed(0)}%</span>
+                    </div>
 
-                    </>
-                  )}
-                </div>       
-                <div className="bg-blue-50 border border-blue-100 rounded-md p-4 text-center">
-                  <p className="text-xs text-gray-500">
-                    {jenisPajak === "pph21" ? "PPh 21" : "PPh 23"}
-                  </p>
-                  <p className="text-2xl font-bold text-blue-900">
-                    {formatRupiah(pph)}
-                  </p>
-                </div>
-              </>
-    )}
-                      
-            </div>   
-  )}
+                  </div>
 
-  {jenisPajak === "pph23" && (
-    <div className="bg-white rounded-lg shadow-sm border p-6">
-      <h3 className="text-sm font-semibold text-gray-700 mb-5">
-        Ringkasan
-      </h3>
-
-      {pph === null && !loading ? (
-        <p className="text-xs text-gray-400">
-          Hasil akan muncul setelah perhitungan
-        </p>
-      ) : (
-        <>
-          <div className="space-y-2 text-xs mb-4">
-
-            <div className="flex justify-between">
-              <span>Kode Objek Pajak</span>
-              <span className="font-medium">{kodeObjekPph23}</span>
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-center">
+                    <p className="text-xs text-gray-500 mb-1">PPh 23 </p>
+                    <p className="text-lg font-bold text-blue-900">
+                      {formatRupiah(pph)}
+                    </p>
+                  </div>
+                </>
+              )}
             </div>
+          )}
+        </div>
+      </main>
 
-            <div className="flex justify-between">
-              <span>Penghasilan Bruto</span>
-              <span>{formatRupiah(Number((brutoPph23 || "").replace(/\./g,"")))}</span>
+      {modal.open && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center">
+          <div className="bg-white rounded-lg p-6 w-full max-w-sm shadow-lg">
+            <h2 className="text-lg font-semibold mb-2">{modal.title}</h2>
+            <p className="text-sm text-gray-600 mb-5">{modal.message}</p>
+            <div className="flex justify-end">
+              <button
+                onClick={() => setModal({ ...modal, open: false })}
+                className="px-4 py-2 bg-blue-900 text-white text-sm rounded-md"
+              >
+                OK
+              </button>
             </div>
-
-            <div className="flex justify-between">
-              <span>Tarif</span>
-            <span>{Number(tarifPph23).toFixed(0)}%</span> 
-            </div>
-
           </div>
-
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-center">
-            <p className="text-xs text-gray-500 mb-1">PPh 23 </p>
-            <p className="text-lg font-bold text-blue-900">
-              {formatRupiah(pph)}
-            </p>
-          </div>
-        </>
+        </div>
+      )}
+      {notif.show && (
+        <div
+          className={`fixed top-5 right-5 bg-green-600 text-white px-4 py-3 rounded-lg shadow-lg text-sm
+    ${notif.exiting ? "animate-slideOut" : "animate-slideIn"}`}
+        >
+          {notif.message}
+        </div>
       )}
     </div>
-  )}
-          </div>
-        </main>
+  );
+}
 
-        {modal.open && (
-          <div className="fixed inset-0 bg-black/40 flex items-center justify-center">
-            <div className="bg-white rounded-lg p-6 w-full max-w-sm shadow-lg">
-              <h2 className="text-lg font-semibold mb-2">{modal.title}</h2>
-              <p className="text-sm text-gray-600 mb-5">{modal.message}</p>
-              <div className="flex justify-end">
-                <button
-                  onClick={() => setModal({ ...modal, open: false })}
-                  className="px-4 py-2 bg-blue-900 text-white text-sm rounded-md"
-                >
-                  OK
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-{notif.show && (
-  <div
-    className={`fixed top-5 right-5 bg-green-600 text-white px-4 py-3 rounded-lg shadow-lg text-sm
-    ${notif.exiting ? "animate-slideOut" : "animate-slideIn"}`}
-  >
-    {notif.message}
-  </div>
-)}
-      </div>
-    );
-  }
-
-  export default KalkulatorPajak;
+export default KalkulatorPajak;
