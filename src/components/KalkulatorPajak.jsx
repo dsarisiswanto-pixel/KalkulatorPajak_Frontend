@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import api from "../services/api";
+import rrtc from "../assets/rrtc.jpeg";
 import { MapPin, Phone, Mail } from "lucide-react";
 import { IoMdCheckmarkCircle } from "react-icons/io";
 import Select from "react-select";
@@ -540,85 +541,85 @@ function KalkulatorPajak() {
       tarif: 0
     },
     "28-403-01": {
-      "nama": "Persewaan Tanah dan/atau Bangunan",
-      "tarif": 10
+      nama: "Persewaan Tanah dan/atau Bangunan",
+      tarif: 10
     },
     "28-403-02": {
-      "nama": "Persewaan Tanah dan/atau Bangunan",
-      "tarif": 10
+      nama: "Persewaan Tanah dan/atau Bangunan",
+      tarif: 10
     },
     "28-404-01": {
-      "nama": "Bunga Tabungan dan Bunga Diskonto yang Ditempatkan di Dalam Negeri yang Dananya Bersumber Selain dari Devisa Hasil Ekspor (DHE)",
-      "tarif": 20
+      nama: "Bunga Tabungan dan Bunga Diskonto yang Ditempatkan di Dalam Negeri yang Dananya Bersumber Selain dari Devisa Hasil Ekspor (DHE)",
+      tarif: 20
     },
     "28-404-02": {
-      "nama": "Bunga Deposito yang Ditempatkan di Dalam Negeri (mata uang IDR bersumber dari DHE tenor 1 bulan)",
-      "tarif": 7.50
+      nama: "Bunga Deposito yang Ditempatkan di Dalam Negeri (mata uang IDR bersumber dari DHE tenor 1 bulan)",
+      tarif: 7.50
     },
     "28-404-03": {
-      "nama": "Bunga Deposito yang Ditempatkan di Dalam Negeri (mata uang IDR bersumber dari DHE tenor 3 bulan)",
-      "tarif": 5
+      nama: "Bunga Deposito yang Ditempatkan di Dalam Negeri (mata uang IDR bersumber dari DHE tenor 3 bulan)",
+      tarif: 5
     },
     "28-404-04": {
-      "nama": "Bunga Deposito yang Ditempatkan di Dalam Negeri (mata uang IDR bersumber dari DHE tenor 6 bulan atau lebih)",
-      "tarif": 0
+      nama: "Bunga Deposito yang Ditempatkan di Dalam Negeri (mata uang IDR bersumber dari DHE tenor 6 bulan atau lebih)",
+      tarif: 0
     },
     "28-404-05": {
-      "nama": "Bunga Deposito yang Ditempatkan di Dalam Negeri (mata uang USD bersumber dari DHE tenor 1 bulan)",
-      "tarif": 10
+      nama: "Bunga Deposito yang Ditempatkan di Dalam Negeri (mata uang USD bersumber dari DHE tenor 1 bulan)",
+      tarif: 10
     },
     "28-404-06": {
-      "nama": "Bunga Deposito yang Ditempatkan di Dalam Negeri (mata uang USD bersumber dari DHE tenor 3 bulan)",
-      "tarif": 7.50
+      nama: "Bunga Deposito yang Ditempatkan di Dalam Negeri (mata uang USD bersumber dari DHE tenor 3 bulan)",
+      tarif: 7.50
     },
     "28-404-07": {
-      "nama": "Bunga Deposito yang Ditempatkan di Dalam Negeri (mata uang USD bersumber dari DHE tenor 6 bulan)",
-      "tarif": 2.50
+      nama: "Bunga Deposito yang Ditempatkan di Dalam Negeri (mata uang USD bersumber dari DHE tenor 6 bulan)",
+      tarif: 2.50
     },
     "28-404-08": {
-      "nama": "Bunga Deposito yang Ditempatkan di Dalam Negeri (mata uang USD bersumber dari DHE tenor lebih 6 bulan)",
-      "tarif": 0
+      nama: "Bunga Deposito yang Ditempatkan di Dalam Negeri (mata uang USD bersumber dari DHE tenor lebih 6 bulan)",
+      tarif: 0
     },
     "28-404-09": {
-      "nama": "Bunga Deposito/Tabungan yang Ditempatkan di Luar Negeri Melalui Bank yang Didirikan atau Bertempat Kedudukan di Indonesia atau Cabang Bank Luar Negeri di Indonesia",
-      "tarif": 20
+      nama: "Bunga Deposito/Tabungan yang Ditempatkan di Luar Negeri Melalui Bank yang Didirikan atau Bertempat Kedudukan di Indonesia atau Cabang Bank Luar Negeri di Indonesia",
+      tarif: 20
     },
     "28-404-10": {
-      "nama": "Diskonto Sertifikat Bank Indonesia",
-      "tarif": 20
+      nama: "Diskonto Sertifikat Bank Indonesia",
+      tarif: 20
     },
     "28-404-11": {
-      "nama": "Jasa Giro",
-      "tarif": 20
+      nama: "Jasa Giro",
+      tarif: 20
     },
     "28-404-XX": {
-      "nama": "Bunga Deposito/Tabungan, Diskonto SBI dan Jasa Giro",
-      "tarif": 0
+      nama: "Bunga Deposito/Tabungan, Diskonto SBI dan Jasa Giro",
+      tarif: 0
     },
     "28-405-01": {
-      "nama": "Hadiah Undian (yang diterima Wajib Pajak dalam negeri)",
-      "tarif": 25
+      nama: "Hadiah Undian (yang diterima Wajib Pajak dalam negeri)",
+      tarif: 25
     },
     "28-405-02": {
-      "nama": "Hadiah Undian (yang diterima Wajib Pajak luar negeri)",
-      "tarif": 25
+      nama: "Hadiah Undian (yang diterima Wajib Pajak luar negeri)",
+      tarif: 25
     },
     "28-406-01": {
-      "nama": "Transaksi Penjualan Saham di Bursa Efek (Bukan Saham Pendiri)",
-      "tarif": 0.10
+      nama: "Transaksi Penjualan Saham di Bursa Efek (Bukan Saham Pendiri)",
+      tarif: 0.10
     },
     "28-407-01": {
-      "nama": "Transaksi Penjualan Saham di Bursa Efek (Saham Pendiri)",
-      "tarif": 0.50
+      nama: "Transaksi Penjualan Saham di Bursa Efek (Saham Pendiri)",
+      tarif: 0.50
     },
     "28-408-01": {
-      "nama": "Transaksi Penjualan Saham Milik Perusahaan Modal Ventura Tidak di Bursa Efek",
-      "tarif": 0.10
+      nama: "Transaksi Penjualan Saham Milik Perusahaan Modal Ventura Tidak di Bursa Efek",
+      tarif: 0.10
     },
     
     "28-409-15": {
-      "nama": "Pekerjaan Konstruksi yang Dilakukan oleh Penyedia Jasa yang Memiliki Sertifikat Badan Usaha Kualifikasi Kecil atau Sertifikat Kompetensi Kerja untuk Usaha Orang Perseorangan (Disetor Sendiri)",
-      "tarif": 1.75
+      nama: "Pekerjaan Konstruksi yang Dilakukan oleh Penyedia Jasa yang Memiliki Sertifikat Badan Usaha Kualifikasi Kecil atau Sertifikat Kompetensi Kerja untuk Usaha Orang Perseorangan (Disetor Sendiri)",
+      tarif: 1.75
     },
     
 
@@ -661,7 +662,7 @@ function KalkulatorPajak() {
       <header className="bg-gradient-to-r from-blue-950 via-blue-900 to-blue-800 text-white shadow-lg">
         <div className="max-w-7xl mx-auto px-8 py-4 flex items-center gap-4">
           <div className="bg-white p-2 rounded-xl shadow-md">
-            <img src="src/assets/rrtc.jpeg" className="w-12 h-12 object-contain" />
+            <img src={rrtc} className="w-12 h-12 object-contain" />
           </div>
           <div>
             <h1 className="text-lg font-bold">RRTC.ID</h1>
