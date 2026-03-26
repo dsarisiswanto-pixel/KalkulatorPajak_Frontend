@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import api from "../services/api";
 import { MapPin, Phone, Mail } from "lucide-react";
+import { IoMdCheckmarkCircle } from "react-icons/io";
 import Select from "react-select";
 
 function KalkulatorPajak() {
@@ -71,6 +72,9 @@ function KalkulatorPajak() {
     { value: "4", label: "Golongan IV, Perwira Menengah, Perwira Tinggi dan Pejabat Negara" },
   ];
 
+  const [kodeObjekPph42, setKodeObjekPph42] = useState("");
+  const [brutoPph42, setBrutoPph42] = useState("");
+  const [tarifPph42, setTarifPph42] = useState(0);
   const [penghasilanTerpotong, setPenghasilanTerpotong] = useState("");
   const [pakaiPenghasilanTerpotong, setPakaiPenghasilanTerpotong] = useState(false);
   const handlePph23 = () => {
@@ -156,6 +160,33 @@ function KalkulatorPajak() {
     if (jenisPajak === "pph23") {
       return handlePph23();
     }
+    if (jenisPajak === "pph4ayat2") {
+      const bruto = Number((brutoPph42 || "").replace(/\./g, "")) || 0;
+
+      if (!kodeObjekPph42 || bruto <= 0) {
+        showModal("warning", "Form Belum Lengkap", "Lengkapi data PPh 4(2)");
+        return;
+      }
+
+      const hasil = bruto * (tarifPph42 / 100);
+      setPph(hasil);
+
+      setNotif({
+        show: true,
+        message: "Perhitungan PPh 4(2) berhasil",
+        exiting: false
+      });
+
+      setTimeout(() => {
+        setNotif((prev) => ({ ...prev, exiting: true }));
+      }, 2500);
+
+      setTimeout(() => {
+        setNotif({ show: false, message: "", exiting: false });
+      }, 3000);
+
+      return;
+    }
   };
 
   const handlePph21 = async () => {
@@ -195,11 +226,17 @@ function KalkulatorPajak() {
         return;
       }
       const cleanPphTerpotong = Number((pphTerpotong || "").replace(/\./g, "")) || 0;
-      const cleanBiayaJabatan = Number(biayaJabatan.replace(/\./g, "")) || 0;
+      const cleanBiayaJabatan = Number((biayaJabatan || "").replace(/\./g, "")) || 0;
+      const cleanTunjangan = Number((tunjanganPph || "").replace(/\./g, "")) || 0;
+      const cleanPremi = Number((premiAsuransi || "").replace(/\./g, "")) || 0;
+      const cleanBonus = Number((bonusThr || "").replace(/\./g, "")) || 0;
 
       payload = {
         jenis_pemotongan: "tahunan",
         gaji: cleanGaji,
+        premi: cleanPremi,
+        tunjangan: cleanTunjangan,
+        bonus: cleanBonus,
         masaAwal: parseInt(masaAwal),
         masaAkhir: parseInt(masaAkhir),
         biayaJabatan: cleanBiayaJabatan,
@@ -365,6 +402,9 @@ function KalkulatorPajak() {
       ? Number((penghasilanTerpotong || "").replace(/\./g, "")) || 0
       : 0;
 
+  const [tunjanganPph, setTunjanganPph] = useState("");
+  const [premiAsuransi, setPremiAsuransi] = useState("");
+  const [bonusThr, setBonusThr] = useState("");
 
   useEffect(() => {
     setGaji("");
@@ -458,6 +498,143 @@ function KalkulatorPajak() {
     tarif: data.tarif
   }));
 
+  const objekPph42 = {
+    "28-401-01": {
+      nama: "Bunga Obligasi, Surat Utang Negara, atau Obligasi Daerah yang Diterima Wajib Pajak Dalam Negeri dan Bentuk Usaha Tetap",
+      tarif: 15
+    },
+    "28-401-02": {
+      nama: "Bunga Obligasi yang Diterima Wajib Pajak Luar Negeri",
+      tarif: 20
+    },
+    "28-401-03": {
+      nama: "Bunga Obligasi yang Diterima Wajib Pajak Dalam Negeri dan Bentuk Usaha Tetap",
+      tarif: 10
+    },
+    "28-401-04": {
+      nama: "Diskonto Surat Perbendaharaan Negara yang diterima Wajib Pajak Dalam Negeri dan Bentuk Usaha Tetap",
+      tarif: 20
+    },
+    "28-401-05": {
+      nama: "Diskonto Surat Perbendaharaan Negara yang diterima Wajib Pajak Luar Negeri",
+      tarif: 20
+    },
+    "28-401-06": {
+      nama: "Bunga Obligasi yang Diterima Wajib Pajak Dalam Negeri dan Bentuk Usaha Tetap",
+      tarif: 10
+    },
+    "28-401-XX": {
+      nama: "Bunga/Diskonto Obligasi Surat Berharga Negara",
+      tarif: 0
+    },
+    "28-402-01": {
+      nama: "Pengalihan Hak atas Tanah dan Bangunan",
+      tarif: 2.50
+    },
+    "28-402-02": {
+      nama: "Pengalihan Rumah Sederhana dan Rumah Susun Sederhana yang Dilakukan WP yang Usaha Pokoknya Mengalihkan Hak atas Tanah dan Bangunan",
+      tarif: 1
+    },
+    "28-402-03": {
+      nama: "Pengalihan Hak atas Tanah dan Bangunan kepada Pemerintah, BUMN yang Mendaoat Penugasan dari Pemerintah, Kepala Daerah, sesuai UU Pengadaan Tanah bagi pembangunan untuk Kepentingan Umum",
+      tarif: 0
+    },
+    "28-403-01": {
+      "nama": "Persewaan Tanah dan/atau Bangunan",
+      "tarif": 10
+    },
+    "28-403-02": {
+      "nama": "Persewaan Tanah dan/atau Bangunan",
+      "tarif": 10
+    },
+    "28-404-01": {
+      "nama": "Bunga Tabungan dan Bunga Diskonto yang Ditempatkan di Dalam Negeri yang Dananya Bersumber Selain dari Devisa Hasil Ekspor (DHE)",
+      "tarif": 20
+    },
+    "28-404-02": {
+      "nama": "Bunga Deposito yang Ditempatkan di Dalam Negeri (mata uang IDR bersumber dari DHE tenor 1 bulan)",
+      "tarif": 7.50
+    },
+    "28-404-03": {
+      "nama": "Bunga Deposito yang Ditempatkan di Dalam Negeri (mata uang IDR bersumber dari DHE tenor 3 bulan)",
+      "tarif": 5
+    },
+    "28-404-04": {
+      "nama": "Bunga Deposito yang Ditempatkan di Dalam Negeri (mata uang IDR bersumber dari DHE tenor 6 bulan atau lebih)",
+      "tarif": 0
+    },
+    "28-404-05": {
+      "nama": "Bunga Deposito yang Ditempatkan di Dalam Negeri (mata uang USD bersumber dari DHE tenor 1 bulan)",
+      "tarif": 10
+    },
+    "28-404-06": {
+      "nama": "Bunga Deposito yang Ditempatkan di Dalam Negeri (mata uang USD bersumber dari DHE tenor 3 bulan)",
+      "tarif": 7.50
+    },
+    "28-404-07": {
+      "nama": "Bunga Deposito yang Ditempatkan di Dalam Negeri (mata uang USD bersumber dari DHE tenor 6 bulan)",
+      "tarif": 2.50
+    },
+    "28-404-08": {
+      "nama": "Bunga Deposito yang Ditempatkan di Dalam Negeri (mata uang USD bersumber dari DHE tenor lebih 6 bulan)",
+      "tarif": 0
+    },
+    "28-404-09": {
+      "nama": "Bunga Deposito/Tabungan yang Ditempatkan di Luar Negeri Melalui Bank yang Didirikan atau Bertempat Kedudukan di Indonesia atau Cabang Bank Luar Negeri di Indonesia",
+      "tarif": 20
+    },
+    "28-404-10": {
+      "nama": "Diskonto Sertifikat Bank Indonesia",
+      "tarif": 20
+    },
+    "28-404-11": {
+      "nama": "Jasa Giro",
+      "tarif": 20
+    },
+    "28-404-XX": {
+      "nama": "Bunga Deposito/Tabungan, Diskonto SBI dan Jasa Giro",
+      "tarif": 0
+    },
+    "28-405-01": {
+      "nama": "Hadiah Undian (yang diterima Wajib Pajak dalam negeri)",
+      "tarif": 25
+    },
+    "28-405-02": {
+      "nama": "Hadiah Undian (yang diterima Wajib Pajak luar negeri)",
+      "tarif": 25
+    },
+    "28-406-01": {
+      "nama": "Transaksi Penjualan Saham di Bursa Efek (Bukan Saham Pendiri)",
+      "tarif": 0.10
+    },
+    "28-407-01": {
+      "nama": "Transaksi Penjualan Saham di Bursa Efek (Saham Pendiri)",
+      "tarif": 0.50
+    },
+    "28-408-01": {
+      "nama": "Transaksi Penjualan Saham Milik Perusahaan Modal Ventura Tidak di Bursa Efek",
+      "tarif": 0.10
+    },
+    
+    "28-409-15": {
+      "nama": "Pekerjaan Konstruksi yang Dilakukan oleh Penyedia Jasa yang Memiliki Sertifikat Badan Usaha Kualifikasi Kecil atau Sertifikat Kompetensi Kerja untuk Usaha Orang Perseorangan (Disetor Sendiri)",
+      "tarif": 1.75
+    },
+    
+
+  };
+  const opsiPph42 = Object.entries(objekPph42).map(([kode, data]) => ({
+    value: kode,
+    label: `${kode} - ${data.nama}`,
+    tarif: data.tarif
+  }));
+
+  useEffect(() => {
+    setKodeObjekPph42("");
+    setBrutoPph42("");
+    setTarifPph42(0);
+  }, [jenisPajak]);
+
 
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col">
@@ -487,7 +664,7 @@ function KalkulatorPajak() {
             <img src="src/assets/rrtc.jpeg" className="w-12 h-12 object-contain" />
           </div>
           <div>
-            <h1 className="text-lg font-bold">RRCT.ID</h1>
+            <h1 className="text-lg font-bold">RRTC.ID</h1>
             <p className="text-sm text-blue-200">Sistem Perhitungan PPh 21</p>
           </div>
         </div>
@@ -506,6 +683,8 @@ function KalkulatorPajak() {
               <option value="">Pilih Jenis Pajak</option>
               <option value="pph21">PPh 21</option>
               <option value="pph23">PPh 23</option>
+              <option value="pph4ayat2">PPh 4 (2)</option>
+
             </select>
 
             {jenisPajak === "pph21" && (
@@ -590,7 +769,7 @@ function KalkulatorPajak() {
                           <option value="">Pilih Status PTKP</option>
                           {Object.keys(ptkpMapping).map((key) => (
                             <option key={key} value={key}>
-                              {key}
+                              {key} - {ptkpMapping[key].toLocaleString("id-ID")}
                             </option>
                           ))}
                         </select>
@@ -698,7 +877,9 @@ function KalkulatorPajak() {
                     >
                       <option value="">Pilih Status PTKP</option>
                       {Object.keys(ptkpMapping).map((key) => (
-                        <option key={key} value={key}>{key}</option>
+                        <option key={key} value={key}>
+                          {key} - {ptkpMapping[key].toLocaleString("id-ID")}
+                        </option>
                       ))}
                     </select>
                   </div>
@@ -777,7 +958,9 @@ function KalkulatorPajak() {
                     >
                       <option value="">Pilih Status PTKP</option>
                       {Object.keys(ptkpMapping).map((key) => (
-                        <option key={key} value={key}>{key}</option>
+                        <option key={key} value={key}>
+                          {key} - {ptkpMapping[key].toLocaleString("id-ID")}
+                        </option>
                       ))}
                     </select>
                   </div>
@@ -792,6 +975,45 @@ function KalkulatorPajak() {
                       className="w-full border rounded-md p-2 mt-1 mb-4 text-sm"
                     />
                   </div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+                  <div>
+                    <label className="text-xs text-gray-500">
+                      Tunjangan PPh
+                    </label>
+                    <input
+                      type="text"
+                      value={tunjanganPph}
+                      onChange={(e) => setTunjanganPph(formatAngka(e.target.value))}
+                      className="w-full border rounded-md p-2 mt-1 mb-4 text-sm"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-xs text-gray-500">
+                      Premi Asuransi
+                    </label>
+                    <input
+                      type="text"
+                      value={premiAsuransi}
+                      onChange={(e) => setPremiAsuransi(formatAngka(e.target.value))}
+                      className="w-full border rounded-md p-2 mt-1 mb-4 text-sm"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-xs text-gray-500">
+                      Bonus / THR / Natura
+                    </label>
+                    <input
+                      type="text"
+                      value={bonusThr}
+                      onChange={(e) => setBonusThr(formatAngka(e.target.value))}
+                      className="w-full border rounded-md p-2 mt-1 mb-4 text-sm"
+                    />
+                  </div>
+
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
@@ -844,6 +1066,7 @@ function KalkulatorPajak() {
 
 
                 </div>
+
 
                 <div className="mb-4">
                   <label className="text-gray-500 text-xs">Masa Penghasilan</label>
@@ -1041,6 +1264,47 @@ function KalkulatorPajak() {
                 </button>
               </>
             )}
+
+            {jenisPajak === "pph4ayat2" && (
+              <>
+                <label className="text-xs text-gray-500">Kode Objek Pajak</label>
+                <Select
+                  options={opsiPph42}
+                  placeholder="Pilih Kode Objek Pajak"
+                  isSearchable
+                  className="w-full border rounded-md p-2 mt-1 mb-4 text-sm"
+                  menuPortalTarget={document.body}
+                  styles={selectStyles}
+                  onChange={(val) => {
+                    setKodeObjekPph42(val?.value);
+                    setTarifPph42(val?.tarif);
+                  }}
+                />
+
+                <label className="text-xs text-gray-500">Penghasilan Bruto</label>
+                <input
+                  type="text"
+                  value={brutoPph42}
+                  onChange={(e) => setBrutoPph42(formatAngka(e.target.value))}
+                  className="w-full border rounded-md p-2 mt-1 mb-4 text-sm"
+                />
+
+                <label className="text-xs text-gray-500">Tarif</label>
+                <input
+                  value={`${tarifPph42}%`}
+                  readOnly
+                  className="w-full border rounded-md p-2 mt-1 mb-4 text-sm bg-gray-100"
+                />
+
+                <button
+                  onClick={handleHitung}
+                  disabled={loading}
+                  className="w-full bg-blue-900 hover:bg-blue-950 text-white py-2 rounded-md text-sm font-semibold"
+                >
+                  {loading ? "Memproses..." : "Hitung Pajak"}
+                </button>
+              </>
+            )}
           </div>
 
 
@@ -1101,9 +1365,9 @@ function KalkulatorPajak() {
                         </div>
 
                         {/* <div className="flex justify-between">
-        <span>PPh Pasal 21 Terutang</span>
-        <span>{formatRupiah(hasilTahunan.pph21Terutang)}</span>
-      </div> */}
+            <span>PPh Pasal 21 Terutang</span>
+            <span>{formatRupiah(hasilTahunan.pph21Terutang)}</span>
+          </div> */}
                         <div className="flex justify-between">
                           <span>PPh Pasal 21 Sudah Dipotong</span>
                           <span>{formatRupiah(hasilTahunan.pph21SudahDipotong)}</span>
@@ -1196,6 +1460,54 @@ function KalkulatorPajak() {
               )}
             </div>
           )}
+          {jenisPajak === "pph4ayat2" && (
+            <div className="bg-white rounded-lg shadow-sm border p-6">
+              <h3 className="text-sm font-semibold text-gray-700 mb-5">
+                Ringkasan
+              </h3>
+
+              {pph === null && !loading ? (
+                <p className="text-xs text-gray-400">
+                  Hasil akan muncul setelah perhitungan
+                </p>
+              ) : (
+                <>
+                  <div className="space-y-2 text-xs mb-4">
+
+
+                    <div className="flex justify-between">
+                      <span className="font-semibold">Jenis Pemotongan</span>
+                      <span className="font-medium">PPh 4(2)</span>
+                    </div>
+
+                    <div className="flex justify-between">
+                      <span>Penghasilan Bruto</span>
+                      <span>
+                        {formatRupiah(
+                          Number((brutoPph42 || "").replace(/\./g, ""))
+                        )}
+                      </span>
+                    </div>
+
+                    <div className="flex justify-between">
+                      <span>Tarif</span>
+                      <span>
+                        {Number(tarifPph42).toFixed(0)}%
+                      </span>
+                    </div>
+
+                  </div>
+
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-center">
+                    <p className="text-xs text-gray-500 mb-1">PPh 4(2)</p>
+                    <p className="text-lg font-bold text-blue-900">
+                      {formatRupiah(pph)}
+                    </p>
+                  </div>
+                </>
+              )}
+            </div>
+          )}
         </div>
       </main>
 
@@ -1217,10 +1529,12 @@ function KalkulatorPajak() {
       )}
       {notif.show && (
         <div
-          className={`fixed top-5 right-5 bg-green-600 text-white px-4 py-3 rounded-lg shadow-lg text-sm
+          className={`fixed top-5 right-5 bg-blue-400 text-white px-4 py-3 rounded-lg shadow-lg text-sm
+    flex items-center gap-2
     ${notif.exiting ? "animate-slideOut" : "animate-slideIn"}`}
         >
-          {notif.message}
+          <IoMdCheckmarkCircle size={20} className="shrink-0" />
+          <span>{notif.message}</span>
         </div>
       )}
     </div>
