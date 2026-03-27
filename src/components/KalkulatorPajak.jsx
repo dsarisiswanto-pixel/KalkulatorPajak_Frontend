@@ -76,34 +76,48 @@ function KalkulatorPajak() {
   const [kodeObjekPph42, setKodeObjekPph42] = useState("");
   const [brutoPph42, setBrutoPph42] = useState("");
   const [tarifPph42, setTarifPph42] = useState(0);
+  const [tarifBackend, setTarifBackend] = useState(null);
   const [penghasilanTerpotong, setPenghasilanTerpotong] = useState("");
   const [pakaiPenghasilanTerpotong, setPakaiPenghasilanTerpotong] = useState(false);
-  const handlePph23 = () => {
+  const handlePph23 = async () => {
     const bruto = Number((brutoPph23 || "").replace(/\./g, "")) || 0;
-    const tarif = Number(tarifPph23) || 0;
+    // const tarif = Number(tarifPph23) || 0;
 
     if (!kodeObjekPph23 || bruto <= 0) {
       showModal("warning", "Form Belum Lengkap", "Lengkapi data PPh 23 terlebih dahulu");
       return;
     }
 
-    const hasil = bruto * (tarif / 100);
+    try {
+      setLoading(true);
+      const payload = {
+        kode_objek_pajak: kodeObjekPph23,
+        gaji: bruto
+      }
+      const response = await api.post("/pph23", payload);
+      const hasil =
+        response.data?.data?.hasil_perhitungan ?? response.data?.hasil_perhitungan ?? response.data?.data ?? {};
+      const nilaiPph = hasil?.pph23 ?? hasil?.pajak ?? 0;
+      setPph(Number(nilaiPph));
+      setNotif({
+        show: true,
+        message: "Perhitungan PPh 23 berhasil",
+        exiting: false
+      });
 
-    setPph(hasil);
+      setTimeout(() => {
+        setNotif((prev) => ({ ...prev, exiting: true }));
+      }, 2500);
 
-    setNotif({
-      show: true,
-      message: "Perhitungan PPh 23 berhasil",
-      exiting: false
-    });
-
-    setTimeout(() => {
-      setNotif((prev) => ({ ...prev, exiting: true }));
-    }, 2500);
-
-    setTimeout(() => {
-      setNotif({ show: false, message: "", exiting: false });
-    }, 3000);
+      setTimeout(() => {
+        setNotif({ show: false, message: "", exiting: false });
+      }, 3000);
+    } catch (error) {
+      console.error("Error menghitung PPh 23:", error);
+      showModal("error", "Gagal", "Terjadi kesalahan saat menghitung PPh 23");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const [kodeObjekPph23, setKodeObjekPph23] = useState("");
@@ -168,24 +182,35 @@ function KalkulatorPajak() {
         showModal("warning", "Form Belum Lengkap", "Lengkapi data PPh 4(2)");
         return;
       }
-
-      const hasil = bruto * (tarifPph42 / 100);
-      setPph(hasil);
-
-      setNotif({
-        show: true,
-        message: "Perhitungan PPh 4(2) berhasil",
-        exiting: false
-      });
-
-      setTimeout(() => {
-        setNotif((prev) => ({ ...prev, exiting: true }));
-      }, 2500);
-
-      setTimeout(() => {
-        setNotif({ show: false, message: "", exiting: false });
-      }, 3000);
-
+      try {
+        setLoading(true);
+        const payload = {
+          kode_objek_pajak: kodeObjekPph42,
+          gaji: bruto
+        }
+        const response = await api.post("/pph4", payload);
+        const hasil = response.data?.data?.hasil_perhitungan ?? response.data?.hasil_perhitungan ?? response.data?.data ?? {};
+        const nilaiPph = hasil?.["pph4(2)"] ?? 0;
+        const tarifBackend = hasil?.tarif ?? 0;
+        setPph(Number(nilaiPph));
+        setTarifBackend(tarifBackend);
+        setNotif({
+          show: true,
+          message: "Perhitungan PPh 4(2) berhasil",
+          exiting: false
+        });
+        setTimeout(() => {
+          setNotif((prev) => ({ ...prev, exiting: true }));
+        }, 2500);
+        setTimeout(() => {
+          setNotif({ show: false, message: "", exiting: false });
+        }, 3000);
+      } catch (error) {
+        console.error("Error menghitung PPh 4(2):", error);
+        showModal("error", "Gagal", "Terjadi kesalahan saat menghitung PPh 4(2)");
+      } finally {
+        setLoading(false);
+      }
       return;
     }
   };
@@ -416,81 +441,81 @@ function KalkulatorPajak() {
   }, [jenisPemotongan]);
 
   const objekPph23 = {
-    "2410001": { nama: "Hadiah, Penghargaan, Bonus dan lainnya Selain yang Telah Dipotong PPh Pasal Ayat(1) Huruf E UU PPh", tarif: 15 },
-    "2410002": { nama: "Sewa dan Penghasilan Lain Sehubung dengan Penggunaan Harta Kecuali Sewa Tanah dan Bangunan yang Telah DIkenai PPh Pasal 4 Ayat(2) UU PPh", tarif: 2 },
-    "2410101": { nama: "Dividen", tarif: 15 },
-    "2410201": { nama: "Bunga Selain yang Dikenakan PPh Pasal 4 ayat (2)", tarif: 15 },
-    "2410301": { nama: "Royalti", tarif: 15 },
+    "24-100-01": { nama: "Hadiah, Penghargaan, Bonus dan lainnya Selain yang Telah Dipotong PPh Pasal Ayat(1) Huruf E UU PPh", tarif: 15 },
+    "24-100-02": { nama: "Sewa dan Penghasilan Lain Sehubung dengan Penggunaan Harta Kecuali Sewa Tanah dan Bangunan yang Telah DIkenai PPh Pasal 4 Ayat(2) UU PPh", tarif: 2 },
+    "24-101-01": { nama: "Dividen", tarif: 15 },
+    "24-102-01": { nama: "Bunga Selain yang Dikenakan PPh Pasal 4 ayat (2)", tarif: 15 },
+    "24-103-01": { nama: "Royalti", tarif: 15 },
 
-    "2410401": { nama: "Jasa Teknik", tarif: 2 },
-    "2410402": { nama: "Jasa Manajemen", tarif: 2 },
-    "2410403": { nama: "Jasa Konsultan", tarif: 2 },
-    "2410404": { nama: "Jasa Penilai (Appraisal)", tarif: 2 },
-    "2410405": { nama: "Jasa Aktuaris", tarif: 2 },
-    "2410406": { nama: "Jasa Akutansi, Pembukuan, dan Atestasi Laporan Keuangan", tarif: 2 },
-    "2410407": { nama: "Jasa Hukum", tarif: 2 },
-    "2410408": { nama: "Jasa Arsitektur", tarif: 2 },
-    "2410409": { nama: "Jasa Perencanaan Kota dan Arsitektur Landscape", tarif: 2 },
-    "2410410": { nama: "Jasa Perancang (Design)", tarif: 2 },
-    "2410411": { nama: "Jasa Pengeboran Dribling di bidang Penambangan Minyak dan Gas BUmi (Migas) Kecuali yang Dilakukan oleh Badan Usaha Tetap (BUT)", tarif: 2 },
-    "2410412": { nama: "Jasa Penunjang di Bidang Usaha Panas Bumi dan Penambangan Minyak dan Gas Bumi (Migas)", tarif: 2 },
-    "2410413": { nama: "Jasa Penambangan dan Jasa Penunjang di Bidang Usaha Panas Bumi dan Penambangan Minyak dan Gas Bumi (Migas)", tarif: 2 },
-    "2410414": { nama: "Jasa Penunjang di Bidang Penerbangan dan Bandar Udara", tarif: 2 },
-    "2410415": { nama: "Jasa Penebangan Hutan", tarif: 2 },
-    "2410416": { nama: "Jasa Pengolahan Limbah", tarif: 2 },
-    "2410417": { nama: "Jasa Penyedia Tenaga Kerja dan Tenaga Ahli (Outsoircing Service)", tarif: 2 },
-    "2410418": { nama: "Jasa Perantara dan Keagenan", tarif: 2 },
-    "2410419": { nama: "Jasa Bidang Perdagangan Surat-Surat Berharga, Kecuali yang Dilakukan Bursa Efek, Kustodian Sentral Efek Indonesia (KSEI) dan Kliring Penjaminan Efek Indonesia (KPEI)", tarif: 2 },
-    "2410420": { nama: "Jasa Kustodian/Penyimpanan/Penitipan, Kecuali yang Dilakukan Oleh KSEI", tarif: 2 },
-    "2410421": { nama: "Jasa Pengisian Suara (Dubbing) dan Sulih Suara", tarif: 2 },
-    "2410422": { nama: "Jasa Mixing Film", tarif: 2 },
-    "2410423": { nama: "Jasa Pembuatan Sarana Promosi Film, Iklan, Poster, Foto, Slide, Klise, Banner, Pamphlet, Baliho dan Folder", tarif: 2 },
-    "2410424": { nama: "Jasa Sehubungan Dengan Software Atau Hardware Atau Sistem Komputer, Termasuk Perawatan, Pemeliharaan dan Perbaikan", tarif: 2 },
-    "2410425": { nama: "Jasa Pembuatan dan Pengelolaan Website", tarif: 2 },
-    "2410426": { nama: "Jasa Internet Termasuk Sambungannya", tarif: 2 },
-    "2410427": { nama: "Jasa Penyimpanan, Pengolahan dan Penyaluran Data, Informasi dan Program", tarif: 2 },
-    "2410428": { nama: "Jasa Instalasi/Pemasangan Mesin, Peralatan Listrik, Telepon, Air, Gas, Ac dan Tv Kabel, Selain Yang dilakukan Oleh Wajib Pajak yang RUang Lingkupnya DiBidang Konstruksi dan Mempunyai izin atau Sertifikasi Sebagai Pengusaha Konstruksi", tarif: 2 },
-    "2410429": { nama: "Jasa Perawatan/Perbaikan/Pemeliharaan Mesin, Peralatan, Listrik, Telepon, Air, Gas, Ac dan Tv Kabel, Selain Yang Dilakukan Oleh WP yang Ruang Lingkupnya di Bidang Konstruksi dan Mempunyai Izin dan Sertifikat Sebagai Pengusaha Konstruksi", tarif: 2 },
-    "2410430": { nama: "Jasa Perawatan Kendaraan dan Alat Transportasi Darat, Laut dan Udara", tarif: 2 },
-    "2410431": { nama: "Jasa Maklon", tarif: 2 },
-    "2410432": { nama: "Jasa Penyelidikan dan Keamanan", tarif: 2 },
-    "2410433": { nama: "Jasa Penyelenggara Kegiatan Atau Event Organizer", tarif: 2 },
-    "2410434": { nama: "Jasa Penyediaan Tempat atau Waktu Dalam Media Massa, Media Luar Ruang Atau Media Lain Untuk Penyampaian Infromasi dan Jasa", tarif: 2 },
-    "2410435": { nama: "Jasa Pembasmian Hama", tarif: 2 },
-    "2410436": { nama: "Jasa Kebersihan Atau Cleaning Service", tarif: 2 },
-    "2410437": { nama: "JAsa Sedot Septic Tank", tarif: 2 },
-    "2410438": { nama: "Jasa Pemeliharaan Kolam", tarif: 2 },
-    "2410439": { nama: "Jasa Ketering Atau Tata Boga", tarif: 2 },
-    "2410440": { nama: "Jasa Freight Forwading", tarif: 2 },
-    "2410441": { nama: "Jasa Logistik", tarif: 2 },
-    "2410442": { nama: "Jasa Pengurusan Dokumen", tarif: 2 },
-    "2410443": { nama: "Jasa Pengepakan", tarif: 2 },
-    "2410444": { nama: "Jasa Loading dan Unloading", tarif: 2 },
-    "2410445": { nama: "Jasa Laboratium dan Pengujian Kecuali yang Dilakukan Oleh Lembaga atau Institusi Pendidikan Dalam Rangka Penelitian Akademis", tarif: 2 },
-    "2410446": { nama: "Jasa Pengelolaan Parkir", tarif: 2 },
-    "2410447": { nama: "Jasa Penyodiran Tanah", tarif: 2 },
-    "2410448": { nama: "Jasa Penyiapan dan Pengolahan Lahan", tarif: 2 },
-    "2410449": { nama: "Jasa Pembibitan dan Penanaman Bibit", tarif: 2 },
-    "2410450": { nama: "Jasa Pemeliharaan Tanaman", tarif: 2 },
-    "2410451": { nama: "Jasa Permanen", tarif: 2 },
-    "2410452": { nama: "Jasa Pengolahan Hasil Pertanian, Perkebunan, Perikanan, Pertenakan dan Perhutanan ", tarif: 2 },
-    "2410453": { nama: "Jasa Dekorasi", tarif: 2 },
-    "2410454": { nama: "Jasa Pencetakan/Penerbitan", tarif: 2 },
-    "2410455": { nama: "Jasa Penerjemah", tarif: 2 },
-    "2410456": { nama: "Jasa Pengangkutan/Ekspedisi Kecuali Yang Telah Diatur Dalam Pasal 15 Undang-Undang Pajak Penghasilan", tarif: 2 },
-    "2410457": { nama: "Jasa Pelayanan Pelabuhan", tarif: 2 },
-    "2410458": { nama: "Jasa Pengangkutan Melalui Jalur Pipa", tarif: 2 },
-    "2410459": { nama: "Jasa Pengelolaan Penitipan Anak", tarif: 2 },
-    "2410460": { nama: "Jasa Pelatihan dan Kursus", tarif: 2 },
-    "2410461": { nama: "Jasa Pengiriman dan Pengisian Uang ke ATM", tarif: 2 },
-    "2410462": { nama: "Jasa Sertifikasi", tarif: 2 },
-    "2410463": { nama: "Jasa Survey", tarif: 2 },
-    "2410464": { nama: "Jasa Tester", tarif: 2 },
-    "2410465": { nama: "Jasa Selain Jasa-jasa Tersebut di Atas yang Pembayaran DIbebankan pada APBN (Anggaran Pendapatan dan Belanja Negara) Atau APBD (Anggaran Pendapatan dan Belanja Daerah)", tarif: 2 },
-    "2410466": { nama: "Jasa Penyelenggaraan Layanan Transaksi Pembayaran Terkait dengan Distribusi Token Oleh Penyelenggara Distribusi", tarif: 2 },
-    "2410467": { nama: "Jasa Pemasaran dengan Media Voucer Oleh Penyelenggara Voucer", tarif: 2 },
-    "2410468": { nama: "Jasa Penyelenggara Layanan Transaksi Pembayaran Terkait dengan Distribusi Voucer Oleh Penyelenggara Voucer dan Penyelenggara Distribusi", tarif: 2 },
-    "2410469": { nama: "Jasa Penyelenggara Program Loyalitas dan Penghargaan Pelanggan (Costumer Loyalty/Reward Program) Oleh Penyelenggara Voucer", tarif: 2 },
+    "24-104-01": { nama: "Jasa Teknik", tarif: 2 },
+    "24-104-02": { nama: "Jasa Manajemen", tarif: 2 },
+    "24-104-03": { nama: "Jasa Konsultan", tarif: 2 },
+    "24-104-04": { nama: "Jasa Penilai (Appraisal)", tarif: 2 },
+    "24-104-05": { nama: "Jasa Aktuaris", tarif: 2 },
+    "24-104-06": { nama: "Jasa Akutansi, Pembukuan, dan Atestasi Laporan Keuangan", tarif: 2 },
+    "24-104-07": { nama: "Jasa Hukum", tarif: 2 },
+    "24-104-08": { nama: "Jasa Arsitektur", tarif: 2 },
+    "24-104-09": { nama: "Jasa Perencanaan Kota dan Arsitektur Landscape", tarif: 2 },
+    "24-104-10": { nama: "Jasa Perancang (Design)", tarif: 2 },
+    "24-104-11": { nama: "Jasa Pengeboran Dribling di bidang Penambangan Minyak dan Gas BUmi (Migas) Kecuali yang Dilakukan oleh Badan Usaha Tetap (BUT)", tarif: 2 },
+    "24-104-12": { nama: "Jasa Penunjang di Bidang Usaha Panas Bumi dan Penambangan Minyak dan Gas Bumi (Migas)", tarif: 2 },
+    "24-104-13": { nama: "Jasa Penambangan dan Jasa Penunjang di Bidang Usaha Panas Bumi dan Penambangan Minyak dan Gas Bumi (Migas)", tarif: 2 },
+    "24-104-14": { nama: "Jasa Penunjang di Bidang Penerbangan dan Bandar Udara", tarif: 2 },
+    "24-104-15": { nama: "Jasa Penebangan Hutan", tarif: 2 },
+    "24-104-16": { nama: "Jasa Pengolahan Limbah", tarif: 2 },
+    "24-104-17": { nama: "Jasa Penyedia Tenaga Kerja dan Tenaga Ahli (Outsoircing Service)", tarif: 2 },
+    "24-104-18": { nama: "Jasa Perantara dan Keagenan", tarif: 2 },
+    "24-104-19": { nama: "Jasa Bidang Perdagangan Surat-Surat Berharga, Kecuali yang Dilakukan Bursa Efek, Kustodian Sentral Efek Indonesia (KSEI) dan Kliring Penjaminan Efek Indonesia (KPEI)", tarif: 2 },
+    "24-104-20": { nama: "Jasa Kustodian/Penyimpanan/Penitipan, Kecuali yang Dilakukan Oleh KSEI", tarif: 2 },
+    "24-104-21": { nama: "Jasa Pengisian Suara (Dubbing) dan Sulih Suara", tarif: 2 },
+    "24-104-22": { nama: "Jasa Mixing Film", tarif: 2 },
+    "24-104-23": { nama: "Jasa Pembuatan Sarana Promosi Film, Iklan, Poster, Foto, Slide, Klise, Banner, Pamphlet, Baliho dan Folder", tarif: 2 },
+    "24-104-24": { nama: "Jasa Sehubungan Dengan Software Atau Hardware Atau Sistem Komputer, Termasuk Perawatan, Pemeliharaan dan Perbaikan", tarif: 2 },
+    "24-104-25": { nama: "Jasa Pembuatan dan Pengelolaan Website", tarif: 2 },
+    "24-104-26": { nama: "Jasa Internet Termasuk Sambungannya", tarif: 2 },
+    "24-104-27": { nama: "Jasa Penyimpanan, Pengolahan dan Penyaluran Data, Informasi dan Program", tarif: 2 },
+    "24-104-28": { nama: "Jasa Instalasi/Pemasangan Mesin, Peralatan Listrik, Telepon, Air, Gas, Ac dan Tv Kabel, Selain Yang dilakukan Oleh Wajib Pajak yang RUang Lingkupnya DiBidang Konstruksi dan Mempunyai izin atau Sertifikasi Sebagai Pengusaha Konstruksi", tarif: 2 },
+    "24-104-29": { nama: "Jasa Perawatan/Perbaikan/Pemeliharaan Mesin, Peralatan, Listrik, Telepon, Air, Gas, Ac dan Tv Kabel, Selain Yang Dilakukan Oleh WP yang Ruang Lingkupnya di Bidang Konstruksi dan Mempunyai Izin dan Sertifikat Sebagai Pengusaha Konstruksi", tarif: 2 },
+    "24-104-30": { nama: "Jasa Perawatan Kendaraan dan Alat Transportasi Darat, Laut dan Udara", tarif: 2 },
+    "24-104-31": { nama: "Jasa Maklon", tarif: 2 },
+    "24-104-32": { nama: "Jasa Penyelidikan dan Keamanan", tarif: 2 },
+    "24-104-33": { nama: "Jasa Penyelenggara Kegiatan Atau Event Organizer", tarif: 2 },
+    "24-104-34": { nama: "Jasa Penyediaan Tempat atau Waktu Dalam Media Massa, Media Luar Ruang Atau Media Lain Untuk Penyampaian Infromasi dan Jasa", tarif: 2 },
+    "24-104-35": { nama: "Jasa Pembasmian Hama", tarif: 2 },
+    "24-104-36": { nama: "Jasa Kebersihan Atau Cleaning Service", tarif: 2 },
+    "24-104-37": { nama: "JAsa Sedot Septic Tank", tarif: 2 },
+    "24-104-38": { nama: "Jasa Pemeliharaan Kolam", tarif: 2 },
+    "24-104-39": { nama: "Jasa Ketering Atau Tata Boga", tarif: 2 },
+    "24-104-40": { nama: "Jasa Freight Forwading", tarif: 2 },
+    "24-104-41": { nama: "Jasa Logistik", tarif: 2 },
+    "24-104-42": { nama: "Jasa Pengurusan Dokumen", tarif: 2 },
+    "24-104-43": { nama: "Jasa Pengepakan", tarif: 2 },
+    "24-104-44": { nama: "Jasa Loading dan Unloading", tarif: 2 },
+    "24-104-45": { nama: "Jasa Laboratium dan Pengujian Kecuali yang Dilakukan Oleh Lembaga atau Institusi Pendidikan Dalam Rangka Penelitian Akademis", tarif: 2 },
+    "24-104-46": { nama: "Jasa Pengelolaan Parkir", tarif: 2 },
+    "24-104-47": { nama: "Jasa Penyodiran Tanah", tarif: 2 },
+    "24-104-48": { nama: "Jasa Penyiapan dan Pengolahan Lahan", tarif: 2 },
+    "24-104-49": { nama: "Jasa Pembibitan dan Penanaman Bibit", tarif: 2 },
+    "24-104-50": { nama: "Jasa Pemeliharaan Tanaman", tarif: 2 },
+    "24-104-51": { nama: "Jasa Permanen", tarif: 2 },
+    "24-104-52": { nama: "Jasa Pengolahan Hasil Pertanian, Perkebunan, Perikanan, Pertenakan dan Perhutanan ", tarif: 2 },
+    "24-104-53": { nama: "Jasa Dekorasi", tarif: 2 },
+    "24-104-54": { nama: "Jasa Pencetakan/Penerbitan", tarif: 2 },
+    "24-104-55": { nama: "Jasa Penerjemah", tarif: 2 },
+    "24-104-56": { nama: "Jasa Pengangkutan/Ekspedisi Kecuali Yang Telah Diatur Dalam Pasal 15 Undang-Undang Pajak Penghasilan", tarif: 2 },
+    "24-104-57": { nama: "Jasa Pelayanan Pelabuhan", tarif: 2 },
+    "24-104-58": { nama: "Jasa Pengangkutan Melalui Jalur Pipa", tarif: 2 },
+    "24-104-59": { nama: "Jasa Pengelolaan Penitipan Anak", tarif: 2 },
+    "24-104-60": { nama: "Jasa Pelatihan dan Kursus", tarif: 2 },
+    "24-104-61": { nama: "Jasa Pengiriman dan Pengisian Uang ke ATM", tarif: 2 },
+    "24-104-62": { nama: "Jasa Sertifikasi", tarif: 2 },
+    "24-104-63": { nama: "Jasa Survey", tarif: 2 },
+    "24-104-64": { nama: "Jasa Tester", tarif: 2 },
+    "24-104-65": { nama: "Jasa Selain Jasa-jasa Tersebut di Atas yang Pembayaran DIbebankan pada APBN (Anggaran Pendapatan dan Belanja Negara) Atau APBD (Anggaran Pendapatan dan Belanja Daerah)", tarif: 2 },
+    "24-104-66": { nama: "Jasa Penyelenggaraan Layanan Transaksi Pembayaran Terkait dengan Distribusi Token Oleh Penyelenggara Distribusi", tarif: 2 },
+    "24-104-67": { nama: "Jasa Pemasaran dengan Media Voucer Oleh Penyelenggara Voucer", tarif: 2 },
+    "24-104-68": { nama: "Jasa Penyelenggara Layanan Transaksi Pembayaran Terkait dengan Distribusi Voucer Oleh Penyelenggara Voucer dan Penyelenggara Distribusi", tarif: 2 },
+    "24-104-69": { nama: "Jasa Penyelenggara Program Loyalitas dan Penghargaan Pelanggan (Costumer Loyalty/Reward Program) Oleh Penyelenggara Voucer", tarif: 2 },
 
   };
   const opsiPph23 = Object.entries(objekPph23).map(([kode, data]) => ({
@@ -500,128 +525,36 @@ function KalkulatorPajak() {
   }));
 
   const objekPph42 = {
-    "28-401-01": {
-      nama: "Bunga Obligasi, Surat Utang Negara, atau Obligasi Daerah yang Diterima Wajib Pajak Dalam Negeri dan Bentuk Usaha Tetap",
-      tarif: 15
-    },
-    "28-401-02": {
-      nama: "Bunga Obligasi yang Diterima Wajib Pajak Luar Negeri",
-      tarif: 20
-    },
-    "28-401-03": {
-      nama: "Bunga Obligasi yang Diterima Wajib Pajak Dalam Negeri dan Bentuk Usaha Tetap",
-      tarif: 10
-    },
-    "28-401-04": {
-      nama: "Diskonto Surat Perbendaharaan Negara yang diterima Wajib Pajak Dalam Negeri dan Bentuk Usaha Tetap",
-      tarif: 20
-    },
-    "28-401-05": {
-      nama: "Diskonto Surat Perbendaharaan Negara yang diterima Wajib Pajak Luar Negeri",
-      tarif: 20
-    },
-    "28-401-06": {
-      nama: "Bunga Obligasi yang Diterima Wajib Pajak Dalam Negeri dan Bentuk Usaha Tetap",
-      tarif: 10
-    },
-    "28-401-XX": {
-      nama: "Bunga/Diskonto Obligasi Surat Berharga Negara",
-      tarif: 0
-    },
-    "28-402-01": {
-      nama: "Pengalihan Hak atas Tanah dan Bangunan",
-      tarif: 2.50
-    },
-    "28-402-02": {
-      nama: "Pengalihan Rumah Sederhana dan Rumah Susun Sederhana yang Dilakukan WP yang Usaha Pokoknya Mengalihkan Hak atas Tanah dan Bangunan",
-      tarif: 1
-    },
-    "28-402-03": {
-      nama: "Pengalihan Hak atas Tanah dan Bangunan kepada Pemerintah, BUMN yang Mendaoat Penugasan dari Pemerintah, Kepala Daerah, sesuai UU Pengadaan Tanah bagi pembangunan untuk Kepentingan Umum",
-      tarif: 0
-    },
-    "28-403-01": {
-      nama: "Persewaan Tanah dan/atau Bangunan",
-      tarif: 10
-    },
-    "28-403-02": {
-      nama: "Persewaan Tanah dan/atau Bangunan",
-      tarif: 10
-    },
-    "28-404-01": {
-      nama: "Bunga Tabungan dan Bunga Diskonto yang Ditempatkan di Dalam Negeri yang Dananya Bersumber Selain dari Devisa Hasil Ekspor (DHE)",
-      tarif: 20
-    },
-    "28-404-02": {
-      nama: "Bunga Deposito yang Ditempatkan di Dalam Negeri (mata uang IDR bersumber dari DHE tenor 1 bulan)",
-      tarif: 7.50
-    },
-    "28-404-03": {
-      nama: "Bunga Deposito yang Ditempatkan di Dalam Negeri (mata uang IDR bersumber dari DHE tenor 3 bulan)",
-      tarif: 5
-    },
-    "28-404-04": {
-      nama: "Bunga Deposito yang Ditempatkan di Dalam Negeri (mata uang IDR bersumber dari DHE tenor 6 bulan atau lebih)",
-      tarif: 0
-    },
-    "28-404-05": {
-      nama: "Bunga Deposito yang Ditempatkan di Dalam Negeri (mata uang USD bersumber dari DHE tenor 1 bulan)",
-      tarif: 10
-    },
-    "28-404-06": {
-      nama: "Bunga Deposito yang Ditempatkan di Dalam Negeri (mata uang USD bersumber dari DHE tenor 3 bulan)",
-      tarif: 7.50
-    },
-    "28-404-07": {
-      nama: "Bunga Deposito yang Ditempatkan di Dalam Negeri (mata uang USD bersumber dari DHE tenor 6 bulan)",
-      tarif: 2.50
-    },
-    "28-404-08": {
-      nama: "Bunga Deposito yang Ditempatkan di Dalam Negeri (mata uang USD bersumber dari DHE tenor lebih 6 bulan)",
-      tarif: 0
-    },
-    "28-404-09": {
-      nama: "Bunga Deposito/Tabungan yang Ditempatkan di Luar Negeri Melalui Bank yang Didirikan atau Bertempat Kedudukan di Indonesia atau Cabang Bank Luar Negeri di Indonesia",
-      tarif: 20
-    },
-    "28-404-10": {
-      nama: "Diskonto Sertifikat Bank Indonesia",
-      tarif: 20
-    },
-    "28-404-11": {
-      nama: "Jasa Giro",
-      tarif: 20
-    },
-    "28-404-XX": {
-      nama: "Bunga Deposito/Tabungan, Diskonto SBI dan Jasa Giro",
-      tarif: 0
-    },
-    "28-405-01": {
-      nama: "Hadiah Undian (yang diterima Wajib Pajak dalam negeri)",
-      tarif: 25
-    },
-    "28-405-02": {
-      nama: "Hadiah Undian (yang diterima Wajib Pajak luar negeri)",
-      tarif: 25
-    },
-    "28-406-01": {
-      nama: "Transaksi Penjualan Saham di Bursa Efek (Bukan Saham Pendiri)",
-      tarif: 0.10
-    },
-    "28-407-01": {
-      nama: "Transaksi Penjualan Saham di Bursa Efek (Saham Pendiri)",
-      tarif: 0.50
-    },
-    "28-408-01": {
-      nama: "Transaksi Penjualan Saham Milik Perusahaan Modal Ventura Tidak di Bursa Efek",
-      tarif: 0.10
-    },
-    
-    "28-409-15": {
-      nama: "Pekerjaan Konstruksi yang Dilakukan oleh Penyedia Jasa yang Memiliki Sertifikat Badan Usaha Kualifikasi Kecil atau Sertifikat Kompetensi Kerja untuk Usaha Orang Perseorangan (Disetor Sendiri)",
-      tarif: 1.75
-    },
-    
+    "28-401-01": { nama: "Bunga Obligasi, Surat Utang Negara, atau Obligasi Daerah yang Diterima Wajib Pajak Dalam Negeri dan Bentuk Usaha Tetap", tarif: 15 },
+    "28-401-02": { nama: "Bunga Obligasi yang Diterima Wajib Pajak Luar Negeri", tarif: 20 },
+    "28-401-03": { nama: "Bunga Obligasi yang Diterima Wajib Pajak Dalam Negeri dan Bentuk Usaha Tetap", tarif: 10 },
+    "28-401-04": { nama: "Diskonto Surat Perbendaharaan Negara yang diterima Wajib Pajak Dalam Negeri dan Bentuk Usaha Tetap", tarif: 20 },
+    "28-401-05": { nama: "Diskonto Surat Perbendaharaan Negara yang diterima Wajib Pajak Luar Negeri", tarif: 20 },
+    "28-401-06": { nama: "Bunga Obligasi yang Diterima Wajib Pajak Dalam Negeri dan Bentuk Usaha Tetap", tarif: 10 },
+    "28-401-XX": { nama: "Bunga/Diskonto Obligasi Surat Berharga Negara", tarif: 0 },
+    "28-402-01": { nama: "Pengalihan Hak atas Tanah dan Bangunan", tarif: 2.50 },
+    "28-402-02": { nama: "Pengalihan Rumah Sederhana dan Rumah Susun Sederhana yang Dilakukan WP yang Usaha Pokoknya Mengalihkan Hak atas Tanah dan Bangunan", tarif: 1 },
+    "28-402-03": { nama: "Pengalihan Hak atas Tanah dan Bangunan kepada Pemerintah, BUMN yang Mendaoat Penugasan dari Pemerintah, Kepala Daerah, sesuai UU Pengadaan Tanah bagi pembangunan untuk Kepentingan Umum", tarif: 0 },
+    "28-403-01": { nama: "Persewaan Tanah dan/atau Bangunan", tarif: 10 },
+    "28-403-02": { nama: "Persewaan Tanah dan/atau Bangunan", tarif: 10 },
+    "28-404-01": { nama: "Bunga Tabungan dan Bunga Diskonto yang Ditempatkan di Dalam Negeri yang Dananya Bersumber Selain dari Devisa Hasil Ekspor (DHE)", tarif: 20 },
+    "28-404-02": { nama: "Bunga Deposito yang Ditempatkan di Dalam Negeri (mata uang IDR bersumber dari DHE tenor 1 bulan)", tarif: 7.50 },
+    "28-404-03": { nama: "Bunga Deposito yang Ditempatkan di Dalam Negeri (mata uang IDR bersumber dari DHE tenor 3 bulan)", tarif: 5 },
+    "28-404-04": { nama: "Bunga Deposito yang Ditempatkan di Dalam Negeri (mata uang IDR bersumber dari DHE tenor 6 bulan atau lebih)", tarif: 0 },
+    "28-404-05": { nama: "Bunga Deposito yang Ditempatkan di Dalam Negeri (mata uang USD bersumber dari DHE tenor 1 bulan)", tarif: 10 },
+    "28-404-06": { nama: "Bunga Deposito yang Ditempatkan di Dalam Negeri (mata uang USD bersumber dari DHE tenor 3 bulan)", tarif: 7.50 },
+    "28-404-07": { nama: "Bunga Deposito yang Ditempatkan di Dalam Negeri (mata uang USD bersumber dari DHE tenor 6 bulan)", tarif: 2.50 },
+    "28-404-08": { nama: "Bunga Deposito yang Ditempatkan di Dalam Negeri (mata uang USD bersumber dari DHE tenor lebih 6 bulan)", tarif: 0 },
+    "28-404-09": { nama: "Bunga Deposito/Tabungan yang Ditempatkan di Luar Negeri Melalui Bank yang Didirikan atau Bertempat Kedudukan di Indonesia atau Cabang Bank Luar Negeri di Indonesia", tarif: 20 },
+    "28-404-10": { nama: "Diskonto Sertifikat Bank Indonesia", tarif: 20 },
+    "28-404-11": { nama: "Jasa Giro", tarif: 20 },
+    "28-404-XX": { nama: "Bunga Deposito/Tabungan, Diskonto SBI dan Jasa Giro", tarif: 0 },
+    "28-405-01": { nama: "Hadiah Undian (yang diterima Wajib Pajak dalam negeri)", tarif: 25 },
+    "28-405-02": { nama: "Hadiah Undian (yang diterima Wajib Pajak luar negeri)", tarif: 25 },
+    "28-406-01": { nama: "Transaksi Penjualan Saham di Bursa Efek (Bukan Saham Pendiri)", tarif: 0.10 },
+    "28-407-01": { nama: "Transaksi Penjualan Saham di Bursa Efek (Saham Pendiri)", tarif: 0.50 },
+    "28-408-01": { nama: "Transaksi Penjualan Saham Milik Perusahaan Modal Ventura Tidak di Bursa Efek", tarif: 0.10 },
+    "28-409-15": { nama: "Pekerjaan Konstruksi yang Dilakukan oleh Penyedia Jasa yang Memiliki Sertifikat Badan Usaha Kualifikasi Kecil atau Sertifikat Kompetensi Kerja untuk Usaha Orang Perseorangan (Disetor Sendiri)", tarif: 1.75 },
 
   };
   const opsiPph42 = Object.entries(objekPph42).map(([kode, data]) => ({
@@ -783,8 +716,8 @@ function KalkulatorPajak() {
                     <button
                       onClick={() => setSkema("gross")}
                       className={`flex-1 py-2 rounded-md text-xs ${skema === "gross"
-                          ? "bg-blue-800 text-white"
-                          : "bg-gray-200"
+                        ? "bg-blue-800 text-white"
+                        : "bg-gray-200"
                         }`}
                     >
                       Gross
@@ -792,8 +725,8 @@ function KalkulatorPajak() {
                     <button
                       onClick={() => setSkema("grossUp")}
                       className={`flex-1 py-2 rounded-md text-xs ${skema === "grossUp"
-                          ? "bg-blue-800 text-white"
-                          : "bg-gray-200"
+                        ? "bg-blue-800 text-white"
+                        : "bg-gray-200"
                         }`}
                     >
                       Gross Up
@@ -925,8 +858,8 @@ function KalkulatorPajak() {
                   <button
                     onClick={() => setSkema("gross")}
                     className={`flex-1 py-2 rounded-md text-xs ${skema === "gross"
-                        ? "bg-blue-800 text-white"
-                        : "bg-gray-200"
+                      ? "bg-blue-800 text-white"
+                      : "bg-gray-200"
                       }`}
                   >
                     Gross
@@ -934,8 +867,8 @@ function KalkulatorPajak() {
                   <button
                     onClick={() => setSkema("grossUp")}
                     className={`flex-1 py-2 rounded-md text-xs ${skema === "grossUp"
-                        ? "bg-blue-800 text-white"
-                        : "bg-gray-200"
+                      ? "bg-blue-800 text-white"
+                      : "bg-gray-200"
                       }`}
                   >
                     Gross Up
@@ -1251,7 +1184,7 @@ function KalkulatorPajak() {
                 <label className="text-xs text-gray-500">Tarif (%)</label>
                 <input
                   type="text"
-                  value={tarifPph23 ? `${tarifPph23}%` : ""}
+                  value={`${tarifPph23}%`}
                   readOnly
                   className="w-full border rounded-md p-2 mt-1 mb-4 text-sm bg-gray-100"
                 />
@@ -1446,7 +1379,7 @@ function KalkulatorPajak() {
 
                     <div className="flex justify-between">
                       <span>Tarif</span>
-                      <span>{Number(tarifPph23).toFixed(0)}%</span>
+                      <span>{(Number(tarifPph23)/100).toFixed(2)}</span>
                     </div>
 
                   </div>
@@ -1493,7 +1426,7 @@ function KalkulatorPajak() {
                     <div className="flex justify-between">
                       <span>Tarif</span>
                       <span>
-                        {Number(tarifPph42).toFixed(0)}%
+                        {tarifBackend !== null ? tarifBackend : tarifPph42}
                       </span>
                     </div>
 
