@@ -5,7 +5,7 @@ const api = axios.create({
     // headers: {
     //     "Content-Type": "application/json",
     // } 
-    baseURL: "http://192.168.111.164:8000/apihalorek",
+    baseURL: "http://192.168.111.164:8000/api",
 });
 
 export default api;
