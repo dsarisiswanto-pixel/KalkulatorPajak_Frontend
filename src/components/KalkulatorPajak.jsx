@@ -33,6 +33,7 @@
       message: "",
       exiting: false
     });
+    
     const [jenisPajak, setJenisPajak] = useState("");
     const [jenisPemotongan, setJenisPemotongan] = useState("");
     const [kodeObjekPajak, setKodePajak] = useState("");
@@ -50,6 +51,8 @@
     const [pphTerpotong, setPphTerpotong] = useState("");
     const [masaAkhir, setMasaAkhir] = useState("");
     const [biayaJabatan, setBiayaJabatan] = useState("");
+    const [dppPpn, setDppPpn] = useState("");
+    const [ppn, setPpn] = useState(null);
     const [modal, setModal] = useState({
       open: false,
       type: "info",
@@ -59,8 +62,12 @@
     const [kodeObjekPph22, setKodeObjekPph22] = useState("");
     const [brutoPph22, setBrutoPph22] = useState("");
     const [tarifPph22, setTarifPph22] = useState(0);
+    const [dppPpnbm, setDppPpnbm] = useState("");
+    const [tarifPpnbm, setTarifPpnbm] = useState("");
+    const [ppnbm, setPpnbm] = useState(null);
 
   const [isVisible, setIsVisible] = useState(false);
+  const [data, setData] = useState(null);
 
 
   useEffect(() => {
@@ -96,7 +103,6 @@
     const handlePph23 = async () => {
     const bruto = Number((brutoPph23 || "").replace(/\./g, "")) || 0;
       // const tarif = Number(tarifPph23) || 0;
- 
 
 
       if (!kodeObjekPph23 || bruto <= 0) {
@@ -114,6 +120,7 @@
         const hasil =
           response.data?.data?.hasil_perhitungan ?? response.data?.hasil_perhitungan ?? response.data?.data ?? {};
         const nilaiPph = hasil?.pph23 ?? hasil?.pajak ?? 0;
+        console.log("INI HASIL:", hasil);
         setPph(Number(nilaiPph));
         setNotif({
           show: true,
@@ -140,6 +147,29 @@
     const [brutoPph23, setBrutoPph23] = useState("");
     const [tarifPph23, setTarifPph23] = useState("");
 
+    const [jenisTarifPphBadan, setJenisTarifPphBadan] = useState("");
+    const [pkpPphBadan, setPkpPphBadan] = useState("");
+    const [brutoPphBadan, setBrutoPphBadan] = useState("");
+    const opsiPphBadan = [
+  { value: "pasal31E_ayat1", label: "Pasal 31E Ayat (1)" },
+  { value: "pasal17_ayat1", label: "Pasal 17 Ayat (1)" },
+  { value: "pasal17_ayat2", label: "Pasal 17 Ayat (2)" },
+];  
+  const getKeteranganPphBadan = () => {
+    if (jenisTarifPphBadan === "pasal31E_ayat1") {
+      return "Wajib Pajak Badan dalam negeri dengan peredaran bruto sampai dengan Rp. 50 Milyar mendapat fasilitas berupa pengurangan tarif sebesar 50%.";
+    }
+
+    if (jenisTarifPphBadan === "pasal17_ayat1") {
+      return "Tarif pajak yang diterapkan atas Penghasilan Kena Pajak bagi Wajib Pajak Badan dalam negeri dan bentuk Usaha Tetap. ";
+    }
+
+    if (jenisTarifPphBadan === "pasal17_ayat2") {
+      return "Wajib Pajak Badan dalam negeri berbentuk PT dapat memperoleh tarif 3% lebih rendah. Syaraynya paling sedikit 40% dari jumlah keseluruhan saham yang di setor di perdagangkan di BEI.";
+    }
+
+    return "-";
+  };
     useEffect(() => {
       setJenisPemotongan("");
       setKodePajak("");
@@ -261,10 +291,10 @@
           {};
 
         const nilaiPph = hasil?.pph22 ?? 0;
-        const tarifBackend = hasil?.tarif ?? 0;
+     
 
         setPph(Number(nilaiPph));
-        setTarifPph22(tarifBackend);
+
 
         setNotif({
           show: true,
@@ -288,6 +318,199 @@
       }
 
       return;
+    }
+    if (jenisPajak === "pph15") {
+  const bruto = Number((brutoPph15 || "").replace(/\./g, "")) || 0;
+
+  if (!kodeObjekPph15 || bruto <= 0) {
+    showModal("warning", "Form Belum Lengkap", "Lengkapi data PPh 15");
+    return;
+  }
+
+  try {
+    setLoading(true);
+
+    const payload = {
+      kode_objek_pajak: kodeObjekPph15,
+      gaji: bruto
+    };
+
+    const response = await api.post("/pph15", payload);
+
+    const hasil =
+      response.data?.data?.hasil_perhitungan ??
+      response.data?.hasil_perhitungan ??
+      response.data?.data ?? {};
+
+    const nilaiPph = hasil?.pph15 ?? 0;
+  
+
+    setPph(Number(nilaiPph));
+
+    
+
+    setNotif({
+      show: true,
+      message: "Perhitungan PPh 15 berhasil",
+      exiting: false
+    });
+
+    setTimeout(() => {
+      setNotif((prev) => ({ ...prev, exiting: true }));
+    }, 2500);
+
+    setTimeout(() => {
+      setNotif({ show: false, message: "", exiting: false });
+    }, 3000);
+
+  } catch (error) {
+    console.error("Error PPh 15:", error);
+    showModal("error", "Gagal", "Terjadi kesalahan saat menghitung PPh 15");
+  } finally {
+    setLoading(false);
+  }
+
+  return;
+    } 
+    if (jenisPajak === "PPhBadan") {
+  console.log("MASUK PPH BADAN");
+
+  const pkp = Number((pkpPphBadan || "").replace(/\./g, "")) || 0;
+  const bruto = Number((brutoPphBadan || "").replace(/\./g, "")) || 0;
+
+
+  if (!jenisTarifPphBadan || pkp <= 0) {
+    showModal("warning", "Form Belum Lengkap", "Lengkapi data PPh Badan");
+    return;
+  }
+
+  try {
+    setLoading(true);
+
+    const payload = {
+      jenisTarif: jenisTarifPphBadan,
+      pkp: pkp,
+      ...(jenisTarifPphBadan === "pasal31E_ayat1" && { gaji: bruto })
+    };
+
+    console.log("PAYLOAD:", payload);
+
+    const response = await api.post("/pphbadan", payload);
+
+    console.log("RESPONSE:", response.data);
+
+    const hasil =
+  response.data?.data?.hasil_perhitungan ??
+  response.data?.hasil_perhitungan ??
+  response.data?.data ??
+  {};
+    setData(hasil); 
+    setPph(Number(hasil?.pphBadan ?? 0));
+
+    setNotif({
+      show: true,
+      message: "Perhitungan PPh Badan berhasil",
+      exiting: false
+    });
+     setTimeout(() => {
+          setNotif((prev) => ({ ...prev, exiting: true }));
+        }, 2500);
+
+        setTimeout(() => {
+          setNotif({ show: false, message: "", exiting: false });
+        }, 3000);
+
+  } catch (error) {
+    console.error("ERROR PPh Badan:", error);
+    showModal("error", "Gagal", "Terjadi kesalahan saat menghitung");
+  } finally {
+    setLoading(false);
+  }
+
+  return;
+    }      
+    if (jenisPajak === "PPN") {
+  const dpp = Number((dppPpn || "").replace(/\./g, "")) || 0;
+
+  if (dpp <= 0) {
+    showModal("warning", "Form Belum Lengkap", "Masukkan DPP terlebih dahulu");
+    return;
+  }
+
+  try {
+    setLoading(true);
+
+    const response = await api.post("/ppn", {
+      gaji: dpp
+    });
+
+    const hasil = response.data?.data ?? {};
+
+    setPpn(Number(hasil?.ppn ?? 0));
+
+    setNotif({
+      show: true,
+      message: "Perhitungan PPN berhasil",
+      exiting: false
+    });
+     setTimeout(() => {
+          setNotif((prev) => ({ ...prev, exiting: true }));
+        }, 2500);
+
+        setTimeout(() => {
+          setNotif({ show: false, message: "", exiting: false });
+        }, 3000);
+
+  } catch (error) {
+    console.error("ERROR PPN:", error);
+    showModal("error", "Gagal", "Terjadi kesalahan saat menghitung PPN");
+  } finally {
+    setLoading(false);
+  }
+
+  return;
+    }
+    if (jenisPajak === "PPnBM") {
+  const dpp = Number((dppPpnbm || "").replace(/\./g, "")) || 0;
+  const tarif = Number(tarifPpnbm) || 0;
+
+  if (dpp <= 0 || tarif <= 0) {
+    showModal("warning", "Form Belum Lengkap", "Isi DPP dan Tarif");
+    return;
+  }
+
+  try {
+    setLoading(true);
+
+    const response = await api.post("/ppnbm", {
+      gaji: dpp,
+      tarif: tarif
+    });
+
+    const hasil = response.data?.data ?? {};
+
+    setPpnbm(Number(hasil.ppnbm)); 
+    setNotif({
+      show: true,
+      message: "Perhitungan PPnBM berhasil",
+      exiting: false
+    });
+     setTimeout(() => {
+          setNotif((prev) => ({ ...prev, exiting: true }));
+        }, 2500);
+
+        setTimeout(() => {
+          setNotif({ show: false, message: "", exiting: false });
+        }, 3000);
+
+  } catch (error) {
+    console.error(error);
+    showModal("error", "Gagal", "Error hitung PPnBM");
+  } finally {
+    setLoading(false);
+  }
+
+  return;
     }
     };
     
@@ -690,8 +913,114 @@
   { value: "22-100-08", label: "22-100-08 - Penjualan Hasil Produksi Kepada Distributor di Dalam Negeri Oleh Badan Usaha/Industri Tertentu (Industri Baja)", tarif: 0.30 },
   { value: "22-100-09", label: "22-100-09 - Penjualan Hasil Produksi Kepada Distributor di Dalam Negeri oleh Basan Usaha/Industro Tertentu (Industri Otomotif)", tarif: 0.45 },
   { value: "22-100-10", label: "22-100-10 - Penjualan Hasill Produksi Kepada Distributor di Dalam Negeri oleh Badan Usaha/Industri Tertentu (Industri Farmasi)", tarif: 0.30 },
+  { value: "22-100-11", label: "22-100-11 - Penjualan Hasil Produksi Kepada Distributor di Dalam Negeri oleh Badan Usaha/Industri Tertentu (Industri Kertas)", tarif: 0.10 },
+  { value: "22-100-12", label: "22-100-12 - Penjualan Kendara Bermotor di Dalam Negeri oleh ATPM, APM dan Importir Umum Kendaraan Bermotor", tarif: 0.45 },
+  { value: "22-100-13", label: "22-100-13 - Pembelian oleh Badan Usaha Berupa Komoditas Tambang Batubara, Mineral Logam dan Mineral Bukan Logam dari Badan atau Orang Pribadi Pemegang IUP", tarif: 1.50 },
+  { value: "22-100-14", label: "22-100-14 - Penjualan Emas Batangahn di Dalam Negeri oleh Badan Usaha", tarif: 0.25 },
+  { value: "22-100-15", label: "22-100-15 - Pembelian Bahan Hasil Kehutanan yang Belum Melalui Proses Industri Manufaktur, untukk Keperluan Industrinya / Eskpornya oleh Badan Usaha Industri/Eksportir", tarif: 0.25 },
+  { value: "22-100-16", label: "22-100-16 - Pembelian Bahan Hasil Pertanian yang Belum Melalui Proses Industri Manufuktur, untuk Keperluan Industrinya/Eskpornya Oleh Badan Usaha Industri/Eksportir", tarif: 0.25 },
+  { value: "22-100-17", label: "22-100-17 - Pembelian Bahan Hasil Pertanian yang Belum Melalui Proses Industri Manufuktur, untuk Keperluan Industrinya/Ekspornya Oleh Badan Usaha Industri/Eksportir", tarif: 0.25 },
+  { value: "22-100-18", label: "22-100-18 - Pembelian Bahan Peternakan yang Belum Melalui Proses Industri Manufaktur, untuk Keperluan Industrinya/Eksportir", tarif: 0.25 },
+  { value: "22-100-19", label: "22-100-19 - Pembelian Bahan Hasil Perikanan yang Belum Melalui Proses Industri Mmanufuktur, untuk Keperluan Industrinya/ekspornya Oleh Badan Usaha Industri/Eksportir", tarif: 0.25 },
+  { value: "22-100-20", label: "22-100-20 - Penjualan BBM oleh Pertamina atau Anak Perusahaan Pertamina Kepada Selain SPBU/Agen/Penyalur (Tidak Final)", tarif: 0.30 },
+  { value: "22-100-21", label: "22-100-21 - Penjualan BBM oleh Badan Usaha Selain Partamina atau Anak Perusahaan Pertamina Kepada Selain SPBU/Agen/Penyalur (Tidak Final)", tarif: 0.30 },
+  { value: "22-100-22", label: "22-100-22 - Penjualan Pelumas oleh Importir/Produsen", tarif: 0.30 },
+  { value: "22-100-23", label: "22-100-23 - Penjualan Pulsa dan Kartu Perdana oleh Penyelenggara Distribusi Tingkat Kedua", tarif: 0.50 },
+  { value: "22-100-24", label: "22-100-24 - Penjualan BBG oleh Produsen/Importir Kepada Selain SPBU/Agen/Penyalur (TIdak Final)", tarif: 0.30 },
+  { value: "22-101-01", label: "22-101-01 - Penjualan BBM oleh Pertamina atau Anak Perusahaan Pertamina Kepada SPBU/Agen/Penyalur (Final) ", tarif: 0.50 },
+  { value: "22-401-01", label: "22-401-01 - Penjualan BBM oleh Pertamina atau Anak Perusahaan Pertamina Kepada SPBU/Agen/Penyalur (Final)", tarif:  0.25},
+  { value: "22-401-02", label: "22-401-02 - Penjualan BBM oleh Badan Usaha Selain Pertamina atau Anak Perusahaan Pertamina Kepada SPBU/Agen/Penyalur (Final)", tarif: 0.30 },
+  { value: "22-401-03", label: "22-401-03 - Penjualan BBG oleh produsen/Inportir kepada SPBU?Agen/Penyalur (Final) ", tarif: 0.30 },
+  { value: "22-403-01", label: "22-403-01 - Penjualan Barang yang Tergolong Sangat Mewah Untuk Pesawat Terbang Pribadi, Helikopter Pribadi, Kapal Pesiar, Yacht, dan Kendaraan Bermotor", tarif: 5 },
+  { value: "22-403-02", label: "22-403-02 - Penjualan Barang yang Tergolong Sangat Mewah Untuk Rumah Beserta Tanahnya,Apartemen, Kondominium dan Sejenisnya", tarif: 1 },
+  { value: "22-401-03", label: "22-401-03 - Penjualan BBG oleh produsen/Inportir kepada SPBU/Agen/Penyalur (Final)", tarif: 0.30 },
+  { value: "22-403-01", label: "22-403-01 - Penjualan Barang yang Tergolong Sangat Mewah Untuk Pesawat Terbang Pribadi, Helikopter Pribadi, Kapal Pesiar, Yacht, dan Kendaraan Bermotor", tarif: 5 },
+  { value: "22-403-02", label: "22-403-02 - Penjualan Barang yang Tergolong Sangat Mewah Untuk Rumah Beserta Tanahnya, Apartemen, Kondominium dan Sejenisnya", tarif: 1 },
+  { value: "22-404-01", label: "22-404-01 - Ekspor Komoditas Tambang Batubara, Mineral Logam, dan Mineral Bukan Logam yang Dilakukan oleh Eksportir, Kecuali WP yang Terikat Dalam PKP2B", tarif: 1.50 },
+  {
+    value: "22-405-02",
+    label: "22-405-02 - Penghasilan Sehubungan dengan Aset Kripto yang dipungut oleh Penyelenggara Perdagangan Melalui Sistem Elektronik yang Bukan Merupakan Pedagang Fisik Aset Kripto",
+    tarif: 0.20 
+  },
+  {
+    value: "22-405-03",
+    label: "22-405-03 - Penghasilan Sehubungan dengan Aset Kripto (Setor Sendiri)",
+    tarif: 0.10 
+  },
+  {
+    value: "22-900-01",
+    label: "22-900-01 - Pembayaran atas Pembelian Barang dan/atau Bahan untuk Kegiatan Usahanya oleh BUMN/Badan Usaha Tertentu",
+    tarif: 1.50 
+  },
+  {
+    value: "23-100-01",
+    label: "23-100-01 - Impor yang Dipungut Ditjen Bea dan Cukai yang Dikenakan tarif 10%",
+    tarif: 10
+  },
+  {
+    value: "23-100-02",
+    label: "23-100-02 - Impor yang Dipungut Ditjen Bea dan Cukai yang Dikenakan tarif 7,5%",
+    tarif: 7.50
+  },
+  {
+    value: "23-100-03",
+    label: "23-100-03 - Impor yang Dipungut Ditjen Bea dan Cukai yang Dikenakan tarif 0,5%",
+    tarif: 0.50
+  },
+  {
+    value: "23-100-04",
+    label: "23-100-04 - Impor yang Dipungut Ditjen Bea dan Cukai atas Importir/Pemilik Barang yang Memiliki API",
+    tarif: 2.50
+  },
+  {
+    value: "23-100-05",
+    label: "23-100-05 - Impor yang Dipungut Ditjen Bea dan Cukai atas Importir/Pemilik Barang yang Tidak Memiliki API",
+    tarif: 7.50
+  }
 ];
+const [kodeObjekPph15, setKodeObjekPph15] = useState("");
+const [brutoPph15, setBrutoPph15] = useState("");
+const [tarifPph15, setTarifPph15] = useState(0);
 
+const opsiPph15 = [
+  {
+    value: "28-410-01",
+    label: "28-410-01 - Imbalan yang Diterima/Diperoleh Sehubungan dengan Pengangkutan Orang dan/atau Barang Termasuk Penyewaan Kapal Laut Oleh Perusahaan Pelayaran Dalam Negeri",
+    tarif: 1.20
+  },
+  {
+    value: "28-410-02",
+    label: "28-410-02 - Imbalan yang Dibayarkan/Terutang kepada Perusahaan Pelayaran Dalam Negeri",
+    tarif: 1.20
+  },
+  {
+    value: "28-411-01",
+    label: "28-411-01 - Imbalan yang Dibayarkan/Terutang kepada Perusahaan Pelayaran dan/atau Penerbangan Luar Negeri Sehubungan dengan Pengangkutan Orang dan/atau Barang (Selain Berdasarkan Perjanjian Charter)",
+    tarif: 2.64 
+  },
+  {
+    value: "28-411-02",
+    label: "28-411-02 - Imbalan Charter Kapal Laut dan/atau Pesawat Udara yang Dibayarkan/Terutang kepada Perusahaan Pelayaran dan/atau Penerbangan Luar Negeri melalui BUT di Indonesia",
+    tarif: 2.64
+  },
+  {
+    value: "28-413-01",
+    label: "28-413-01 - Penghasilan Wajib Pajak Luar Negeri yang Mempunyai Kantor Perwakilan Dagang di Indonesia",
+    tarif: 0.44
+  },
+  {
+    value: "28-499-01",
+    label: "28-499-01 - Penghasilan Wajib Pajak yang Melakukan Kegiatan Usaha Jasa Maklon (Contract Manufacturing) Internasional di Bidang Produksi Mainan Anak-Anak",
+    tarif: 2.10
+  },
+  {
+    value: "29-101-01",
+    label: "29-101-01 - Imbalan Charter Pesawat Udara yang Dibayarkan/Terutang kepada Perusahaan Penerbangan Dalam Negeri oleh Pemotong Pajak",
+    tarif: 1.80
+  }
+];
+const dppAngka = Number((dppPpn || "").replace(/\./g, "")) || 0;
+const totalSetelahPpn = dppAngka + (ppn || 0);
 
     return (
       <div className="min-h-screen bg-gray-100 flex flex-col">
@@ -739,9 +1068,13 @@
               >
                 <option value="">Pilih Jenis Pajak</option>
                 <option value="pph21">PPh 21</option>
+                <option value="pph15">PPh 15</option>
                 <option value="pph22">PPh 22</option>
                 <option value="pph23">PPh 23</option>
                 <option value="pph4ayat2">PPh 4 (2)</option>
+                <option value="PPhBadan">PPh Badan</option>
+                <option value="PPN">PPN</option>
+                <option value="PPnBM">PPnBM</option>
 
               </select>
 
@@ -858,7 +1191,7 @@
                     </div>
                   )}
 
-                  {/* Penghasilan */}
+             
                   <label className="text-xs text-gray-500 mt-4">
                     Penghasilan
                   </label>
@@ -869,7 +1202,6 @@
                     className="w-full border rounded-md p-2 mt-1 mb-3 text-sm"
                   />
 
-                  {/* Tambahan untuk Komisaris */}
                   {kodeObjekPajak === "2110010" && (
                     <>
                       <div className="flex items-center gap-2 mb-2">
@@ -1376,7 +1708,7 @@
             styles={selectStyles}
             onChange={(selected) => {
               setKodeObjekPph22(selected?.value || "");
-              setTarifPph22(selected?.tarif || 0);
+               setTarifPph22(selected?.tarif);
             }}
           />
 
@@ -1390,7 +1722,7 @@
 
           <label className="text-xs text-gray-500">Tarif</label>
           <input
-            value={`${tarifPph22}%`}
+          value={`${Number(tarifPph22).toFixed(2)}%`}
             readOnly
             className="w-full border rounded-md p-2 mt-1 mb-4 text-sm bg-gray-100"
           />
@@ -1403,7 +1735,179 @@
             {loading ? "Memproses..." : "Hitung Pajak"}
           </button>
         </>
-      )}
+              )}
+             {jenisPajak === "pph15" && (
+  <>
+  <label className="text-xs text-gray-500">Kode Objek Pajak</label>
+    <Select
+      options={opsiPph15}
+      placeholder="Pilih Kode Objek Pajak"
+      isSearchable
+      className="w-full text-sm mb-4"
+      menuPortalTarget={document.body}
+      styles={selectStyles}
+      onChange={(selected) => {
+        setKodeObjekPph15(selected?.value || "");
+         setTarifPph15(selected?.tarif);
+      }}
+    />
+<label className="text-xs text-gray-500">Penghasilan Bruto</label>
+    <input
+  type="text"
+  placeholder="Masukkan Penghasilan Bruto"
+  value={brutoPph15}
+  onChange={(e) => {
+    const formatted = formatAngka(e.target.value);
+    setBrutoPph15(formatted);
+  }}
+  className="w-full border rounded-md p-2 text-sm mb-4"
+/>
+<label className="text-xs text-gray-500">Tarif</label>
+    <input
+      type="text"
+      value={`${Number(tarifPph15).toFixed(2)}%`}
+      readOnly
+      className="w-full border rounded-md p-2 text-sm mb-4 bg-gray-100"
+    />
+
+    <button
+      onClick={handleHitung}
+      disabled={loading}
+      className="w-full bg-blue-900 hover:bg-blue-950 text-white py-2 rounded-md text-sm font-semibold"
+    >
+      {loading ? "Memproses..." : "Hitung Pajak"}
+    </button>
+  </>
+              )}
+             {jenisPajak === "PPhBadan" && (
+  <>
+   
+    <label className="text-xs text-gray-500">Jenis Tarif</label>
+    <Select
+      options={opsiPphBadan}
+      placeholder="Pilih Jenis Tarif"
+      className="w-full text-sm mb-2"
+      onChange={(selected) => {
+        setJenisTarifPphBadan(selected?.value || "");
+      }}
+    />
+
+    {jenisTarifPphBadan && (
+      <div className="bg-blue-50 border border-blue-200 rounded-md p-3 text-xs text-blue-800 mb-4">
+        {getKeteranganPphBadan()}
+      </div>
+    )}
+
+    <label className="text-xs text-gray-500">PKP</label>
+    <input
+      type="text"
+      value={pkpPphBadan}
+      onChange={(e) => {
+        const formatted = formatAngka(e.target.value);
+        setPkpPphBadan(formatted);
+      }}
+      className="w-full border rounded-md p-2 text-sm mb-4"
+      placeholder="Masukkan PKP"
+    />
+
+ 
+    {jenisTarifPphBadan === "pasal31E_ayat1" && (
+      <>
+        <label className="text-xs text-gray-500">Peredaran Bruto</label>
+        <input
+          type="text"
+          value={brutoPphBadan}
+          onChange={(e) => {
+            const formatted = formatAngka(e.target.value);
+            setBrutoPphBadan(formatted);
+          }}
+          className="w-full border rounded-md p-2 text-sm mb-4"
+          placeholder="Masukkan Peredaran Bruto"
+        />
+      </>
+    )}
+
+ 
+    <button
+      onClick={handleHitung}
+      disabled={loading}
+      className="w-full bg-blue-900 hover:bg-blue-950 text-white py-2 rounded-md text-sm font-semibold"
+    >
+      {loading ? "Memproses..." : "Hitung Pajak"}
+    </button>
+  </>
+             )}
+             {jenisPajak === "PPN" && (
+  <>
+    <label className="text-xs text-gray-500">DPP</label>
+    <input
+      type="text"
+      value={dppPpn}
+      onChange={(e) => {
+        const formatted = formatAngka(e.target.value);
+        setDppPpn(formatted);
+      }}
+      className="w-full border rounded-md p-2 text-sm mb-4"
+      placeholder="Masukkan DPP"
+    />
+
+    <label className="text-xs text-gray-500">Tarif</label>
+    <input
+      type="text"
+      value="11%"
+      readOnly
+      className="w-full border rounded-md p-2 text-sm mb-4 bg-gray-100"
+    />
+
+    <button
+      onClick={handleHitung}
+      disabled={loading}
+      className="w-full bg-blue-900 hover:bg-blue-950 text-white py-2 rounded-md text-sm font-semibold"
+    >
+      {loading ? "Memproses..." : "Hitung Pajak"}
+    </button>
+  </>
+              )}
+              {jenisPajak === "PPnBM" && (
+              <>
+                <label className="text-xs text-gray-500">DPP</label>
+                <input
+                  type="text"
+                  value={dppPpnbm}
+                  onChange={(e) => {
+                    const formatted = formatAngka(e.target.value);
+                    setDppPpnbm(formatted);
+                  }}
+                  className="w-full border rounded-md p-2 text-sm mb-4"
+                  placeholder="Masukkan DPP"
+                />
+          <label className="text-xs text-gray-500">Tarif (%)</label>
+
+                <div className="relative mb-4">
+                  <input
+                    type="number"
+                    value={tarifPpnbm}
+                    onChange={(e) => setTarifPpnbm(Number(e.target.value))}
+                    min="0"
+                    max="100"
+                    step="0.01"
+                    className="w-full border border-gray-300 rounded-md pr-8 pl-3 py-2 text-sm bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="0"
+                  />
+
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-500 pointer-events-none">
+                    %
+                  </span>
+                </div>
+                <button
+                  onClick={handleHitung}
+                  className="w-full bg-blue-900 hover:bg-blue-950 text-white py-2 rounded-md text-sm font-semibold"
+                >
+                  Hitung Pajak
+                </button>
+              </>
+            )}
+                          
             </div>
 
 
@@ -1619,51 +2123,181 @@
               </div>
             )}
             {jenisPajak === "pph22" && (
-            <div className="bg-white rounded-lg shadow-sm border p-6">
-              <h3 className="text-sm font-semibold text-gray-700 mb-5">
-                Ringkasan
-              </h3>
+                <div className="bg-white rounded-lg shadow-sm border p-6">
+                  <h3 className="text-sm font-semibold text-gray-700 mb-5">
+                    Ringkasan
+                  </h3>
 
-              {loading ? (
-                <div className="flex items-center justify-center h-40">
-                  <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                  {loading ? (
+                    <div className="flex items-center justify-center h-40">
+                      <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                    </div>
+                  ) : pph === null ? (
+                    <p className="text-xs text-gray-400">
+                      Hasil akan muncul setelah perhitungan
+                    </p>
+                  ) : (
+                    <>
+                      <div className="space-y-2 text-xs mb-4">
+
+                        <div className="flex justify-between">
+                          <span className="font-semibold">Jenis Pemotongan</span>
+                          <span className="font-medium">PPh 22</span>
+                        </div>
+
+                        <div className="flex justify-between">
+                          <span>Kode Objek Pajak</span>
+                          <span className="font-medium">{kodeObjekPph22}</span>
+                        </div>
+
+                        <div className="flex justify-between">
+                          <span>Penghasilan Bruto</span>
+                          <span>
+                            {formatRupiah(
+                              Number((brutoPph22 || "").replace(/\./g, ""))
+                            )}
+                          </span>
+                        </div>
+
+                        <div className="flex justify-between">
+                          <span>Tarif</span>
+                        <span>{(Number(tarifPph22) / 100).toFixed(3)}</span>
+                        </div>
+
+            </div>
+
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-center">
+              <p className="text-xs text-gray-500 mb-1">PPh 22</p>
+              <p className="text-lg font-bold text-blue-900">
+                {formatRupiah(pph)}
+              </p>
+            </div>
+          </>
+        )}
+      </div>
+            )}
+            {jenisPajak === "pph15" && (
+        <div className="bg-white rounded-lg shadow-sm border p-6">
+          <h3 className="text-sm font-semibold text-gray-700 mb-5">
+            Ringkasan
+          </h3>
+
+          {loading ? (
+            <div className="flex items-center justify-center h-40">
+              <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+            </div>
+          ) : pph === null ? (
+            <p className="text-xs text-gray-400">
+              Hasil akan muncul setelah perhitungan
+            </p>
+          ) : (
+            <>
+              <div className="space-y-2 text-xs mb-4">
+
+                <div className="flex justify-between">
+                  <span className="font-semibold">Jenis Pemotongan</span>
+                  <span className="font-medium">PPh 15</span>
                 </div>
-              ) : pph === null ? (
-                <p className="text-xs text-gray-400">
-                  Hasil akan muncul setelah perhitungan
+
+                <div className="flex justify-between">
+                  <span>Kode Objek Pajak</span>
+                  <span className="font-medium">{kodeObjekPph15}</span>
+                </div>
+
+                <div className="flex justify-between">
+                  <span>Penghasilan Bruto</span>
+                  <span>
+                    {formatRupiah(
+                      Number((brutoPph15 || "").replace(/\./g, ""))
+                    )}
+                  </span>
+                </div>
+
+                <div className="flex justify-between">
+                  <span>Tarif</span>
+                 <span>{Number(tarifPph15)}%</span>
+                </div>
+
+              </div>
+
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-center">
+                <p className="text-xs text-gray-500 mb-1">PPh 15</p>
+                <p className="text-lg font-bold text-blue-900">
+                  {formatRupiah(pph)}
                 </p>
-              ) : (
-                <>
-                  <div className="space-y-2 text-xs mb-4">
+              </div>
+            </>
+          )}
+        </div>
+            )}
+            {jenisPajak === "PPhBadan" && (
+  <div className="bg-white rounded-lg shadow-sm border p-6">
+    <h3 className="text-sm font-semibold text-gray-700 mb-5">
+      Ringkasan
+    </h3>
 
-                    <div className="flex justify-between">
-                      <span className="font-semibold">Jenis Pemotongan</span>
-                      <span className="font-medium">PPh 22</span>
-                    </div>
+    {loading ? (
+      <div className="flex items-center justify-center h-40">
+        <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    ) : pph === null ? (
+      <p className="text-xs text-gray-400">
+        Hasil akan muncul setelah perhitungan
+      </p>
+    ) : (
+      <>
+        <div className="space-y-2 text-xs mb-4">
 
-                    <div className="flex justify-between">
-                      <span>Kode Objek Pajak</span>
-                      <span className="font-medium">{kodeObjekPph22}</span>
-                    </div>
+   
+          <div className="flex justify-between">
+            <span className="font-semibold">Jenis Pajak</span>
+            <span className="font-medium">PPh Badan</span>
+          </div>
 
-                    <div className="flex justify-between">
-                      <span>Penghasilan Bruto</span>
-                      <span>
-                        {formatRupiah(
-                          Number((brutoPph22 || "").replace(/\./g, ""))
-                        )}
-                      </span>
-                    </div>
+          <div className="flex justify-between">
+            <span>Jenis Tarif</span>
+            <span className="text-right">
+              {jenisTarifPphBadan}
+            </span>
+          </div>
+         {data && (
+          <div className="flex justify-between">
+            <span>Tarif</span>
+            <span>
+              {data.tarif_fasilitas !== undefined 
+                ? `${data.tarif_fasilitas * 100}%`
+                : "-"}
+            </span>
+          </div>
+        )}
 
-                    <div className="flex justify-between">
-                      <span>Tarif</span>
-                      <span>{Number(tarifPph22).toFixed(2)}%</span>
-                    </div>
+
+          <div className="flex justify-between">
+            <span>PKP</span>
+            <span>
+              {formatRupiah(
+                Number((pkpPphBadan || "").replace(/\./g, ""))
+              )}
+            </span>
+          </div>
+
+
+          {jenisTarifPphBadan === "pasal31E_ayat1" && (
+            <div className="flex justify-between">
+              <span>Peredaran Bruto</span>
+              <span>
+                {formatRupiah(
+                  Number((brutoPphBadan || "").replace(/\./g, ""))
+                )}
+              </span>
+            </div>
+          )}  
 
         </div>
 
+ 
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-center">
-          <p className="text-xs text-gray-500 mb-1">PPh 22</p>
+          <p className="text-xs text-gray-500 mb-1">PPh Badan</p>
           <p className="text-lg font-bold text-blue-900">
             {formatRupiah(pph)}
           </p>
@@ -1671,10 +2305,125 @@
       </>
     )}
   </div>
-)}
+            )}
+            {jenisPajak === "PPN" && (
+  <div className="bg-white rounded-lg shadow-sm border p-6">
+    <h3 className="text-sm font-semibold text-gray-700 mb-5">
+      Ringkasan
+    </h3>
+
+    {loading ? (
+      <div className="flex items-center justify-center h-40">
+        <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    ) : ppn === null ? (
+      <p className="text-xs text-gray-400">
+        Hasil akan muncul setelah perhitungan
+      </p>
+    ) : (
+      <>
+        <div className="space-y-2 text-xs mb-4">
+
+          <div className="flex justify-between">
+            <span className="font-semibold">Jenis Pajak</span>
+            <span className="font-medium">PPN</span>
           </div>
+
+          <div className="flex justify-between">
+            <span>DPP</span>
+            <span>
+              {formatRupiah(
+                Number((dppPpn || "").replace(/\./g, ""))
+              )}
+            </span>
+          </div>
+
+          <div className="flex justify-between">
+            <span>Tarif</span>
+            <span>11%</span>
+          </div>
+      
+
+          <div className="flex justify-between">
+            <span>Total Setelah PPN</span>
+            <span>{formatRupiah(totalSetelahPpn)}</span>
+          </div>
+        </div>
+
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-center">
+          <p className="text-xs text-gray-500 mb-1">PPN</p>
+          <p className="text-lg font-bold text-blue-900">
+            {formatRupiah(ppn)}
+          </p>
+        </div>
+
+        
+      </>
+    )}
+  </div>
+            )}
+            {jenisPajak === "PPnBM" && (
+  <div className="bg-white rounded-lg shadow-sm border p-6">
+    <h3 className="text-sm font-semibold text-gray-700 mb-5">
+      Ringkasan
+    </h3>
+
+    {loading ? (
+      <div className="flex items-center justify-center h-40">
+        <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    ) : ppnbm === null ? (
+      <p className="text-xs text-gray-400">
+        Hasil akan muncul setelah perhitungan
+      </p>
+    ) : (
+      <>
+     
+        <div className="space-y-2 text-xs mb-4">
+
+          <div className="flex justify-between">
+            <span className="font-semibold">Jenis Pajak</span>
+            <span className="font-medium">PPnBM</span>
+          </div>
+
+          <div className="flex justify-between">
+            <span>DPP</span>
+            <span>
+              {formatRupiah(
+                Number((dppPpnbm || "").replace(/\./g, ""))
+              )}
+            </span>
+          </div>
+
+          <div className="flex justify-between">
+            <span>{data?.tarif || "-"}</span>
+            <span>{tarifPpnbm}%</span>
+          </div>
+
+        </div>
+
+ 
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-center">
+          <p className="text-xs text-gray-500 mb-1">PPnBM</p>
+          <p className="text-lg font-bold text-blue-900">
+            {formatRupiah(ppnbm)}
+          </p>
+        </div>
+      </>
+    )}
+  </div>
+            )}
+          </div>
+         
         </main>
 
+          <footer className="bg-blue-900 text-white py-4 mt-10 border-t border-blue-800">
+           <div className="max-w-7xl mx-auto px-4 flex justify-center">
+             <p className="text-xs text-gray-200 font-semibold">
+                © 2026 RRTC. All rights reserved.
+            </p>           
+          </div>
+          </footer>
      {isVisible && (
   <div
     className={`fixed inset-0 flex items-center justify-center transition-all duration-300 ${
