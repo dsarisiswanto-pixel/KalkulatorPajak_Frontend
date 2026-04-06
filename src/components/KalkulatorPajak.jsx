@@ -937,46 +937,14 @@
   { value: "22-403-01", label: "22-403-01 - Penjualan Barang yang Tergolong Sangat Mewah Untuk Pesawat Terbang Pribadi, Helikopter Pribadi, Kapal Pesiar, Yacht, dan Kendaraan Bermotor", tarif: 5 },
   { value: "22-403-02", label: "22-403-02 - Penjualan Barang yang Tergolong Sangat Mewah Untuk Rumah Beserta Tanahnya, Apartemen, Kondominium dan Sejenisnya", tarif: 1 },
   { value: "22-404-01", label: "22-404-01 - Ekspor Komoditas Tambang Batubara, Mineral Logam, dan Mineral Bukan Logam yang Dilakukan oleh Eksportir, Kecuali WP yang Terikat Dalam PKP2B", tarif: 1.50 },
-  {
-    value: "22-405-02",
-    label: "22-405-02 - Penghasilan Sehubungan dengan Aset Kripto yang dipungut oleh Penyelenggara Perdagangan Melalui Sistem Elektronik yang Bukan Merupakan Pedagang Fisik Aset Kripto",
-    tarif: 0.20 
-  },
-  {
-    value: "22-405-03",
-    label: "22-405-03 - Penghasilan Sehubungan dengan Aset Kripto (Setor Sendiri)",
-    tarif: 0.10 
-  },
-  {
-    value: "22-900-01",
-    label: "22-900-01 - Pembayaran atas Pembelian Barang dan/atau Bahan untuk Kegiatan Usahanya oleh BUMN/Badan Usaha Tertentu",
-    tarif: 1.50 
-  },
-  {
-    value: "23-100-01",
-    label: "23-100-01 - Impor yang Dipungut Ditjen Bea dan Cukai yang Dikenakan tarif 10%",
-    tarif: 10
-  },
-  {
-    value: "23-100-02",
-    label: "23-100-02 - Impor yang Dipungut Ditjen Bea dan Cukai yang Dikenakan tarif 7,5%",
-    tarif: 7.50
-  },
-  {
-    value: "23-100-03",
-    label: "23-100-03 - Impor yang Dipungut Ditjen Bea dan Cukai yang Dikenakan tarif 0,5%",
-    tarif: 0.50
-  },
-  {
-    value: "23-100-04",
-    label: "23-100-04 - Impor yang Dipungut Ditjen Bea dan Cukai atas Importir/Pemilik Barang yang Memiliki API",
-    tarif: 2.50
-  },
-  {
-    value: "23-100-05",
-    label: "23-100-05 - Impor yang Dipungut Ditjen Bea dan Cukai atas Importir/Pemilik Barang yang Tidak Memiliki API",
-    tarif: 7.50
-  }
+  { value: "22-405-02", label: "22-405-02 - Penghasilan Sehubungan dengan Aset Kripto yang dipungut oleh Penyelenggara Perdagangan Melalui Sistem Elektronik yang Bukan Merupakan Pedagang Fisik Aset Kripto", tarif: 0.20  },
+  { value: "22-405-03", label: "22-405-03 - Penghasilan Sehubungan dengan Aset Kripto (Setor Sendiri)", tarif: 0.10  },
+  { value: "22-900-01", label: "22-900-01 - Pembayaran atas Pembelian Barang dan/atau Bahan untuk Kegiatan Usahanya oleh BUMN/Badan Usaha Tertentu", tarif: 1.50  },
+  { value: "23-100-01", label: "23-100-01 - Impor yang Dipungut Ditjen Bea dan Cukai yang Dikena tarif 10%", tarif: 10 },
+  { value: "23-100-02", label: "23-100-02 - Impor yang Dipungut Ditjen Bea dan Cukai yang Dikena tarif 7,5%", tarif: 7.50 },
+  { value: "23-100-03", label: "23-100-03 - Impor yang Dipungut Ditjen Bea dan Cukai yang Dikena tarif 0,5%", tarif: 0.50 },
+  { value: "23-100-04", label: "23-100-04 - Impor yang Dipungut Ditjen Bea dan Cukai atas Importir/Pemilik Barang yang Memiliki API", tarif: 2.50 },
+  { value: "23-100-05", label: "23-100-05 - Impor yang Dipungut Ditjen Bea dan Cukai atas Importir/Pemilik Barang yang Tidak Memiliki API", tarif: 7.50}
 ];
 const [kodeObjekPph15, setKodeObjekPph15] = useState("");
 const [brutoPph15, setBrutoPph15] = useState("");
@@ -1022,6 +990,14 @@ const opsiPph15 = [
 const dppAngka = Number((dppPpn || "").replace(/\./g, "")) || 0;
 const totalSetelahPpn = dppAngka + (ppn || 0);
 
+useEffect(() => {
+  setPakaiPenghasilanTerpotong(false);
+  setPenghasilanTerpotong("");
+}, [jenisPajak, jenisPemotongan]);
+useEffect(() => {
+  setPakaiPenghasilanTerpotong(false);
+  setPenghasilanTerpotong("");
+}, [kodeObjekPajak]);
     return (
       <div className="min-h-screen bg-gray-100 flex flex-col">
 
@@ -1208,9 +1184,14 @@ const totalSetelahPpn = dppAngka + (ppn || 0);
                         <input
                           type="checkbox"
                           checked={pakaiPenghasilanTerpotong}
-                          onChange={(e) =>
-                            setPakaiPenghasilanTerpotong(e.target.checked)
-                          }
+                          onChange={(e) => {
+                            const checked = e.target.checked;
+                            setPakaiPenghasilanTerpotong(checked);
+
+                            if (!checked) {
+                              setPenghasilanTerpotong("");
+                            }
+                          }}
                         />
                         <label className="text-xs text-gray-500">
                           Ada penghasilan yang telah dipotong PPh21 sebelumnya
@@ -1706,9 +1687,9 @@ const totalSetelahPpn = dppAngka + (ppn || 0);
             className="w-full text-sm mb-4"
             menuPortalTarget={document.body}
             styles={selectStyles}
-            onChange={(selected) => {
-              setKodeObjekPph22(selected?.value || "");
-               setTarifPph22(selected?.tarif);
+              onChange={(val) => {
+              setKodeObjekPph22(val?.value);
+              setTarifPph22(val?.tarif);
             }}
           />
 
@@ -1722,7 +1703,7 @@ const totalSetelahPpn = dppAngka + (ppn || 0);
 
           <label className="text-xs text-gray-500">Tarif</label>
           <input
-          value={`${Number(tarifPph22).toFixed(2)}%`}
+          value={`${tarifPph22}%`}
             readOnly
             className="w-full border rounded-md p-2 mt-1 mb-4 text-sm bg-gray-100"
           />
@@ -1746,9 +1727,9 @@ const totalSetelahPpn = dppAngka + (ppn || 0);
       className="w-full text-sm mb-4"
       menuPortalTarget={document.body}
       styles={selectStyles}
-      onChange={(selected) => {
-        setKodeObjekPph15(selected?.value || "");
-         setTarifPph15(selected?.tarif);
+      onChange={(val) => {
+        setKodeObjekPph15(val?.value || "");
+        setTarifPph15(val?.tarif || 0);
       }}
     />
 <label className="text-xs text-gray-500">Penghasilan Bruto</label>
@@ -1765,7 +1746,7 @@ const totalSetelahPpn = dppAngka + (ppn || 0);
 <label className="text-xs text-gray-500">Tarif</label>
     <input
       type="text"
-      value={`${Number(tarifPph15).toFixed(2)}%`}
+      value={`${tarifPph15}%`}
       readOnly
       className="w-full border rounded-md p-2 text-sm mb-4 bg-gray-100"
     />
@@ -2215,7 +2196,7 @@ const totalSetelahPpn = dppAngka + (ppn || 0);
 
                 <div className="flex justify-between">
                   <span>Tarif</span>
-                 <span>{Number(tarifPph15)}%</span>
+                 <span>{tarifPph15}%</span>
                 </div>
 
               </div>
